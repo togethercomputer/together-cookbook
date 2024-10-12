@@ -1,4 +1,5 @@
-# <img src="images/together.gif" width="250"/> Cookbook
+<img src="images/together.gif" width="250"/>
+# Together Cookbook
 
 The Together Cookbook is a collection of code and guides designed to help developers build with open source models using [Together AI](https://www.together.ai/). The best way to use the recipes is to copy code snippets and integrate them into your own projects!
 
