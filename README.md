@@ -1,4 +1,6 @@
-<img src="images/together.gif" width="100%"/>
+<div style="text-align: center;">
+  <img src="images/together.gif" style="height: auto;"/>
+</div>
 
 <!-- Links -->
 <p align="center">
