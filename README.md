@@ -1,4 +1,4 @@
-<div style="text-align:center;"><img src="images/together.gif" /></div>
+<img src="images/together.gif" width="100%"/>
 
 <!-- Links -->
 <p align="center">
