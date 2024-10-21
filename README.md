@@ -1,6 +1,4 @@
-<div style="display: flex; justify-content: center;">
-  <img src="images/together.gif" width="600" height="138" />
-</div>
+<div style="text-align:center;"><img src="images/together.gif" /></div>
 
 <!-- Links -->
 <p align="center">
