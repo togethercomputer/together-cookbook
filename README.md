@@ -1,4 +1,4 @@
-<img src="images/together.gif" width="100%"/>
+<img src="images/together-color.jpg" width="100%"/>
 
 <!-- Links -->
 <p align="center">
