@@ -1,5 +1,5 @@
-<div style="text-align: center;">
-  <img src="images/together.gif" style="height: auto;"/>
+<div style="display: flex; justify-content: center;">
+  <img src="images/together.gif"/>
 </div>
 
 <!-- Links -->
