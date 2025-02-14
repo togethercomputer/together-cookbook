@@ -17,7 +17,7 @@ client = Together(api_key=os.getenv("TOGETHER_API_KEY"))
 
 EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
 RERANKER_MODEL = "Salesforce/Llama-Rank-V1"
-FINAL_RESPONSE_MODEL = "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo"
+FINAL_RESPONSE_MODEL = "deepseek-ai/DeepSeek-R1"
 data = {}
 
 
