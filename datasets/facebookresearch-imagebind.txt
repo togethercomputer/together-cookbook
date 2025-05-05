@@ -1,0 +1,2902 @@
+Directory structure:
+└── facebookresearch-imagebind/
+    ├── README.md
+    ├── CODE_OF_CONDUCT.md
+    ├── CONTRIBUTING.md
+    ├── LICENSE
+    ├── model_card.md
+    ├── requirements.txt
+    ├── setup.py
+    ├── imagebind/
+    │   ├── __init__.py
+    │   ├── data.py
+    │   ├── bpe/
+    │   │   └── bpe_simple_vocab_16e6.txt.gz
+    │   └── models/
+    │       ├── __init__.py
+    │       ├── helpers.py
+    │       ├── imagebind_model.py
+    │       ├── multimodal_preprocessors.py
+    │       └── transformer.py
+    └── .assets/
+
+================================================
+FILE: README.md
+================================================
+# ImageBind: One Embedding Space To Bind Them All
+
+**[FAIR, Meta AI](https://ai.facebook.com/research/)** 
+
+Rohit Girdhar*,
+Alaaeldin El-Nouby*,
+Zhuang Liu,
+Mannat Singh,
+Kalyan Vasudev Alwala,
+Armand Joulin,
+Ishan Misra*
+
+To appear at CVPR 2023 (*Highlighted paper*)
+
+[[`Paper`](https://facebookresearch.github.io/ImageBind/paper)] [[`Blog`](https://ai.facebook.com/blog/imagebind-six-modalities-binding-ai/)] [[`Demo`](https://imagebind.metademolab.com/)] [[`Supplementary Video`](https://dl.fbaipublicfiles.com/imagebind/imagebind_video.mp4)] [[`BibTex`](#citing-imagebind)]
+
+PyTorch implementation and pretrained models for ImageBind. For details, see the paper: **[ImageBind: One Embedding Space To Bind Them All](https://facebookresearch.github.io/ImageBind/paper)**.
+
+ImageBind learns a joint embedding across six different modalities - images, text, audio, depth, thermal, and IMU data. It enables novel emergent applications ‘out-of-the-box’ including cross-modal retrieval, composing modalities with arithmetic, cross-modal detection and generation.
+
+
+
+![ImageBind](https://user-images.githubusercontent.com/8495451/236859695-ffa13364-3e39-4d99-a8da-fbfab17f9a6b.gif)
+
+## ImageBind model
+
+Emergent zero-shot classification performance.
+
+<table style="margin: auto">
+  <tr>
+    <th>Model</th>
+    <th><span style="color:blue">IN1k</span></th>
+    <th><span style="color:purple">K400</span></th>
+    <th><span style="color:green">NYU-D</span></th>
+    <th><span style="color:LightBlue">ESC</span></th>
+    <th><span style="color:orange">LLVIP</span></th>
+    <th><span style="color:purple">Ego4D</span></th>
+    <th>download</th>
+  </tr>
+  <tr>
+    <td>imagebind_huge</td>
+    <td align="right">77.7</td>
+    <td align="right">50.0</td>
+    <td align="right">54.0</td>
+    <td align="right">66.9</td>
+    <td align="right">63.4</td>
+    <td align="right">25.0</td>
+    <td><a href="https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth">checkpoint</a></td>
+  </tr>
+  
+</table>
+
+## Usage
+
+Install pytorch 1.13+ and other 3rd party dependencies.
+
+```shell
+conda create --name imagebind python=3.10 -y
+conda activate imagebind
+
+pip install .
+```
+
+For windows users, you might need to install `soundfile` for reading/writing audio files. (Thanks @congyue1977)
+
+```
+pip install soundfile
+```
+
+
+Extract and compare features across modalities (e.g. Image, Text and Audio).
+
+```python
+from imagebind import data
+import torch
+from imagebind.models import imagebind_model
+from imagebind.models.imagebind_model import ModalityType
+
+text_list=["A dog.", "A car", "A bird"]
+image_paths=[".assets/dog_image.jpg", ".assets/car_image.jpg", ".assets/bird_image.jpg"]
+audio_paths=[".assets/dog_audio.wav", ".assets/car_audio.wav", ".assets/bird_audio.wav"]
+
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+# Instantiate model
+model = imagebind_model.imagebind_huge(pretrained=True)
+model.eval()
+model.to(device)
+
+# Load data
+inputs = {
+    ModalityType.TEXT: data.load_and_transform_text(text_list, device),
+    ModalityType.VISION: data.load_and_transform_vision_data(image_paths, device),
+    ModalityType.AUDIO: data.load_and_transform_audio_data(audio_paths, device),
+}
+
+with torch.no_grad():
+    embeddings = model(inputs)
+
+print(
+    "Vision x Text: ",
+    torch.softmax(embeddings[ModalityType.VISION] @ embeddings[ModalityType.TEXT].T, dim=-1),
+)
+print(
+    "Audio x Text: ",
+    torch.softmax(embeddings[ModalityType.AUDIO] @ embeddings[ModalityType.TEXT].T, dim=-1),
+)
+print(
+    "Vision x Audio: ",
+    torch.softmax(embeddings[ModalityType.VISION] @ embeddings[ModalityType.AUDIO].T, dim=-1),
+)
+
+# Expected output:
+#
+# Vision x Text:
+# tensor([[9.9761e-01, 2.3694e-03, 1.8612e-05],
+#         [3.3836e-05, 9.9994e-01, 2.4118e-05],
+#         [4.7997e-05, 1.3496e-02, 9.8646e-01]])
+#
+# Audio x Text:
+# tensor([[1., 0., 0.],
+#         [0., 1., 0.],
+#         [0., 0., 1.]])
+#
+# Vision x Audio:
+# tensor([[0.8070, 0.1088, 0.0842],
+#         [0.1036, 0.7884, 0.1079],
+#         [0.0018, 0.0022, 0.9960]])
+
+```
+
+## Model card
+Please see the [model card](model_card.md) for details.
+
+## License
+
+ImageBind code and model weights are released under the CC-BY-NC 4.0 license. See [LICENSE](LICENSE) for additional details.
+
+## Contributing
+
+See [contributing](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md).
+
+## Citing ImageBind
+
+If you find this repository useful, please consider giving a star :star: and citation
+
+```
+@inproceedings{girdhar2023imagebind,
+  title={ImageBind: One Embedding Space To Bind Them All},
+  author={Girdhar, Rohit and El-Nouby, Alaaeldin and Liu, Zhuang
+and Singh, Mannat and Alwala, Kalyan Vasudev and Joulin, Armand and Misra, Ishan},
+  booktitle={CVPR},
+  year={2023}
+}
+```
+
+
+
+================================================
+FILE: CODE_OF_CONDUCT.md
+================================================
+# Code of Conduct
+
+## Our Pledge
+
+In the interest of fostering an open and welcoming environment, we as
+contributors and maintainers pledge to make participation in our project and
+our community a harassment-free experience for everyone, regardless of age, body
+size, disability, ethnicity, sex characteristics, gender identity and expression,
+level of experience, education, socio-economic status, nationality, personal
+appearance, race, religion, or sexual identity and orientation.
+
+## Our Standards
+
+Examples of behavior that contributes to creating a positive environment
+include:
+
+* Using welcoming and inclusive language
+* Being respectful of differing viewpoints and experiences
+* Gracefully accepting constructive criticism
+* Focusing on what is best for the community
+* Showing empathy towards other community members
+
+Examples of unacceptable behavior by participants include:
+
+* The use of sexualized language or imagery and unwelcome sexual attention or
+advances
+* Trolling, insulting/derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or electronic
+address, without explicit permission
+* Other conduct which could reasonably be considered inappropriate in a
+professional setting
+
+## Our Responsibilities
+
+Project maintainers are responsible for clarifying the standards of acceptable
+behavior and are expected to take appropriate and fair corrective action in
+response to any instances of unacceptable behavior.
+
+Project maintainers have the right and responsibility to remove, edit, or
+reject comments, commits, code, wiki edits, issues, and other contributions
+that are not aligned to this Code of Conduct, or to ban temporarily or
+permanently any contributor for other behaviors that they deem inappropriate,
+threatening, offensive, or harmful.
+
+## Scope
+
+This Code of Conduct applies within all project spaces, and it also applies when
+an individual is representing the project or its community in public spaces.
+Examples of representing a project or community include using an official
+project e-mail address, posting via an official social media account, or acting
+as an appointed representative at an online or offline event. Representation of
+a project may be further defined and clarified by project maintainers.
+
+This Code of Conduct also applies outside the project spaces when there is a
+reasonable belief that an individual's behavior may have a negative impact on
+the project or its community.
+
+## Enforcement
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be
+reported by contacting the project team at <opensource-conduct@fb.com>. All
+complaints will be reviewed and investigated and will result in a response that
+is deemed necessary and appropriate to the circumstances. The project team is
+obligated to maintain confidentiality with regard to the reporter of an incident.
+Further details of specific enforcement policies may be posted separately.
+
+Project maintainers who do not follow or enforce the Code of Conduct in good
+faith may face temporary or permanent repercussions as determined by other
+members of the project's leadership.
+
+## Attribution
+
+This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
+available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
+
+[homepage]: https://www.contributor-covenant.org
+
+For answers to common questions about this code of conduct, see
+https://www.contributor-covenant.org/faq
+
+
+================================================
+FILE: CONTRIBUTING.md
+================================================
+# Contributing to ImageBind
+We want to make contributing to this project as easy and transparent as
+possible.
+
+## Pull Requests
+We actively welcome your pull requests.
+
+1. Fork the repo and create your branch from `main`.
+2. If you've added code that should be tested, add tests.
+3. If you've changed APIs, update the documentation.
+4. Ensure the test suite passes.
+5. Make sure your code lints.
+6. If you haven't already, complete the Contributor License Agreement ("CLA").
+
+## Contributor License Agreement ("CLA")
+In order to accept your pull request, we need you to submit a CLA. You only need
+to do this once to work on any of Meta's open source projects.
+
+Complete your CLA here: <https://code.facebook.com/cla>
+
+## Issues
+We use GitHub issues to track public bugs. Please ensure your description is
+clear and has sufficient instructions to be able to reproduce the issue.
+
+Meta has a [bounty program](https://www.facebook.com/whitehat/) for the safe
+disclosure of security bugs. In those cases, please go through the process
+outlined on that page and do not file a public issue.
+
+## License
+By contributing to Omnivore, you agree that your contributions will be licensed
+under the [LICENSE](LICENSE) file in the root directory of this source tree.
+
+
+
+================================================
+FILE: LICENSE
+================================================
+Attribution-NonCommercial-ShareAlike 4.0 International
+
+=======================================================================
+
+Creative Commons Corporation ("Creative Commons") is not a law firm and
+does not provide legal services or legal advice. Distribution of
+Creative Commons public licenses does not create a lawyer-client or
+other relationship. Creative Commons makes its licenses and related
+information available on an "as-is" basis. Creative Commons gives no
+warranties regarding its licenses, any material licensed under their
+terms and conditions, or any related information. Creative Commons
+disclaims all liability for damages resulting from their use to the
+fullest extent possible.
+
+Using Creative Commons Public Licenses
+
+Creative Commons public licenses provide a standard set of terms and
+conditions that creators and other rights holders may use to share
+original works of authorship and other material subject to copyright
+and certain other rights specified in the public license below. The
+following considerations are for informational purposes only, are not
+exhaustive, and do not form part of our licenses.
+
+     Considerations for licensors: Our public licenses are
+     intended for use by those authorized to give the public
+     permission to use material in ways otherwise restricted by
+     copyright and certain other rights. Our licenses are
+     irrevocable. Licensors should read and understand the terms
+     and conditions of the license they choose before applying it.
+     Licensors should also secure all rights necessary before
+     applying our licenses so that the public can reuse the
+     material as expected. Licensors should clearly mark any
+     material not subject to the license. This includes other CC-
+     licensed material, or material used under an exception or
+     limitation to copyright. More considerations for licensors:
+    wiki.creativecommons.org/Considerations_for_licensors
+
+     Considerations for the public: By using one of our public
+     licenses, a licensor grants the public permission to use the
+     licensed material under specified terms and conditions. If
+     the licensor's permission is not necessary for any reason--for
+     example, because of any applicable exception or limitation to
+     copyright--then that use is not regulated by the license. Our
+     licenses grant only permissions under copyright and certain
+     other rights that a licensor has authority to grant. Use of
+     the licensed material may still be restricted for other
+     reasons, including because others have copyright or other
+     rights in the material. A licensor may make special requests,
+     such as asking that all changes be marked or described.
+     Although not required by our licenses, you are encouraged to
+     respect those requests where reasonable. More considerations
+     for the public:
+    wiki.creativecommons.org/Considerations_for_licensees
+
+=======================================================================
+
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+Public License
+
+By exercising the Licensed Rights (defined below), You accept and agree
+to be bound by the terms and conditions of this Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International Public License
+("Public License"). To the extent this Public License may be
+interpreted as a contract, You are granted the Licensed Rights in
+consideration of Your acceptance of these terms and conditions, and the
+Licensor grants You such rights in consideration of benefits the
+Licensor receives from making the Licensed Material available under
+these terms and conditions.
+
+
+Section 1 -- Definitions.
+
+  a. Adapted Material means material subject to Copyright and Similar
+     Rights that is derived from or based upon the Licensed Material
+     and in which the Licensed Material is translated, altered,
+     arranged, transformed, or otherwise modified in a manner requiring
+     permission under the Copyright and Similar Rights held by the
+     Licensor. For purposes of this Public License, where the Licensed
+     Material is a musical work, performance, or sound recording,
+     Adapted Material is always produced where the Licensed Material is
+     synched in timed relation with a moving image.
+
+  b. Adapter's License means the license You apply to Your Copyright
+     and Similar Rights in Your contributions to Adapted Material in
+     accordance with the terms and conditions of this Public License.
+
+  c. BY-NC-SA Compatible License means a license listed at
+     creativecommons.org/compatiblelicenses, approved by Creative
+     Commons as essentially the equivalent of this Public License.
+
+  d. Copyright and Similar Rights means copyright and/or similar rights
+     closely related to copyright including, without limitation,
+     performance, broadcast, sound recording, and Sui Generis Database
+     Rights, without regard to how the rights are labeled or
+     categorized. For purposes of this Public License, the rights
+     specified in Section 2(b)(1)-(2) are not Copyright and Similar
+     Rights.
+
+  e. Effective Technological Measures means those measures that, in the
+     absence of proper authority, may not be circumvented under laws
+     fulfilling obligations under Article 11 of the WIPO Copyright
+     Treaty adopted on December 20, 1996, and/or similar international
+     agreements.
+
+  f. Exceptions and Limitations means fair use, fair dealing, and/or
+     any other exception or limitation to Copyright and Similar Rights
+     that applies to Your use of the Licensed Material.
+
+  g. License Elements means the license attributes listed in the name
+     of a Creative Commons Public License. The License Elements of this
+     Public License are Attribution, NonCommercial, and ShareAlike.
+
+  h. Licensed Material means the artistic or literary work, database,
+     or other material to which the Licensor applied this Public
+     License.
+
+  i. Licensed Rights means the rights granted to You subject to the
+     terms and conditions of this Public License, which are limited to
+     all Copyright and Similar Rights that apply to Your use of the
+     Licensed Material and that the Licensor has authority to license.
+
+  j. Licensor means the individual(s) or entity(ies) granting rights
+     under this Public License.
+
+  k. NonCommercial means not primarily intended for or directed towards
+     commercial advantage or monetary compensation. For purposes of
+     this Public License, the exchange of the Licensed Material for
+     other material subject to Copyright and Similar Rights by digital
+     file-sharing or similar means is NonCommercial provided there is
+     no payment of monetary compensation in connection with the
+     exchange.
+
+  l. Share means to provide material to the public by any means or
+     process that requires permission under the Licensed Rights, such
+     as reproduction, public display, public performance, distribution,
+     dissemination, communication, or importation, and to make material
+     available to the public including in ways that members of the
+     public may access the material from a place and at a time
+     individually chosen by them.
+
+  m. Sui Generis Database Rights means rights other than copyright
+     resulting from Directive 96/9/EC of the European Parliament and of
+     the Council of 11 March 1996 on the legal protection of databases,
+     as amended and/or succeeded, as well as other essentially
+     equivalent rights anywhere in the world.
+
+  n. You means the individual or entity exercising the Licensed Rights
+     under this Public License. Your has a corresponding meaning.
+
+
+Section 2 -- Scope.
+
+  a. License grant.
+
+       1. Subject to the terms and conditions of this Public License,
+          the Licensor hereby grants You a worldwide, royalty-free,
+          non-sublicensable, non-exclusive, irrevocable license to
+          exercise the Licensed Rights in the Licensed Material to:
+
+            a. reproduce and Share the Licensed Material, in whole or
+               in part, for NonCommercial purposes only; and
+
+            b. produce, reproduce, and Share Adapted Material for
+               NonCommercial purposes only.
+
+       2. Exceptions and Limitations. For the avoidance of doubt, where
+          Exceptions and Limitations apply to Your use, this Public
+          License does not apply, and You do not need to comply with
+          its terms and conditions.
+
+       3. Term. The term of this Public License is specified in Section
+          6(a).
+
+       4. Media and formats; technical modifications allowed. The
+          Licensor authorizes You to exercise the Licensed Rights in
+          all media and formats whether now known or hereafter created,
+          and to make technical modifications necessary to do so. The
+          Licensor waives and/or agrees not to assert any right or
+          authority to forbid You from making technical modifications
+          necessary to exercise the Licensed Rights, including
+          technical modifications necessary to circumvent Effective
+          Technological Measures. For purposes of this Public License,
+          simply making modifications authorized by this Section 2(a)
+          (4) never produces Adapted Material.
+
+       5. Downstream recipients.
+
+            a. Offer from the Licensor -- Licensed Material. Every
+               recipient of the Licensed Material automatically
+               receives an offer from the Licensor to exercise the
+               Licensed Rights under the terms and conditions of this
+               Public License.
+
+            b. Additional offer from the Licensor -- Adapted Material.
+               Every recipient of Adapted Material from You
+               automatically receives an offer from the Licensor to
+               exercise the Licensed Rights in the Adapted Material
+               under the conditions of the Adapter's License You apply.
+
+            c. No downstream restrictions. You may not offer or impose
+               any additional or different terms or conditions on, or
+               apply any Effective Technological Measures to, the
+               Licensed Material if doing so restricts exercise of the
+               Licensed Rights by any recipient of the Licensed
+               Material.
+
+       6. No endorsement. Nothing in this Public License constitutes or
+          may be construed as permission to assert or imply that You
+          are, or that Your use of the Licensed Material is, connected
+          with, or sponsored, endorsed, or granted official status by,
+          the Licensor or others designated to receive attribution as
+          provided in Section 3(a)(1)(A)(i).
+
+  b. Other rights.
+
+       1. Moral rights, such as the right of integrity, are not
+          licensed under this Public License, nor are publicity,
+          privacy, and/or other similar personality rights; however, to
+          the extent possible, the Licensor waives and/or agrees not to
+          assert any such rights held by the Licensor to the limited
+          extent necessary to allow You to exercise the Licensed
+          Rights, but not otherwise.
+
+       2. Patent and trademark rights are not licensed under this
+          Public License.
+
+       3. To the extent possible, the Licensor waives any right to
+          collect royalties from You for the exercise of the Licensed
+          Rights, whether directly or through a collecting society
+          under any voluntary or waivable statutory or compulsory
+          licensing scheme. In all other cases the Licensor expressly
+          reserves any right to collect such royalties, including when
+          the Licensed Material is used other than for NonCommercial
+          purposes.
+
+
+Section 3 -- License Conditions.
+
+Your exercise of the Licensed Rights is expressly made subject to the
+following conditions.
+
+  a. Attribution.
+
+       1. If You Share the Licensed Material (including in modified
+          form), You must:
+
+            a. retain the following if it is supplied by the Licensor
+               with the Licensed Material:
+
+                 i. identification of the creator(s) of the Licensed
+                    Material and any others designated to receive
+                    attribution, in any reasonable manner requested by
+                    the Licensor (including by pseudonym if
+                    designated);
+
+                ii. a copyright notice;
+
+               iii. a notice that refers to this Public License;
+
+                iv. a notice that refers to the disclaimer of
+                    warranties;
+
+                 v. a URI or hyperlink to the Licensed Material to the
+                    extent reasonably practicable;
+
+            b. indicate if You modified the Licensed Material and
+               retain an indication of any previous modifications; and
+
+            c. indicate the Licensed Material is licensed under this
+               Public License, and include the text of, or the URI or
+               hyperlink to, this Public License.
+
+       2. You may satisfy the conditions in Section 3(a)(1) in any
+          reasonable manner based on the medium, means, and context in
+          which You Share the Licensed Material. For example, it may be
+          reasonable to satisfy the conditions by providing a URI or
+          hyperlink to a resource that includes the required
+          information.
+       3. If requested by the Licensor, You must remove any of the
+          information required by Section 3(a)(1)(A) to the extent
+          reasonably practicable.
+
+  b. ShareAlike.
+
+     In addition to the conditions in Section 3(a), if You Share
+     Adapted Material You produce, the following conditions also apply.
+
+       1. The Adapter's License You apply must be a Creative Commons
+          license with the same License Elements, this version or
+          later, or a BY-NC-SA Compatible License.
+
+       2. You must include the text of, or the URI or hyperlink to, the
+          Adapter's License You apply. You may satisfy this condition
+          in any reasonable manner based on the medium, means, and
+          context in which You Share Adapted Material.
+
+       3. You may not offer or impose any additional or different terms
+          or conditions on, or apply any Effective Technological
+          Measures to, Adapted Material that restrict exercise of the
+          rights granted under the Adapter's License You apply.
+
+
+Section 4 -- Sui Generis Database Rights.
+
+Where the Licensed Rights include Sui Generis Database Rights that
+apply to Your use of the Licensed Material:
+
+  a. for the avoidance of doubt, Section 2(a)(1) grants You the right
+     to extract, reuse, reproduce, and Share all or a substantial
+     portion of the contents of the database for NonCommercial purposes
+     only;
+
+  b. if You include all or a substantial portion of the database
+     contents in a database in which You have Sui Generis Database
+     Rights, then the database in which You have Sui Generis Database
+     Rights (but not its individual contents) is Adapted Material,
+     including for purposes of Section 3(b); and
+
+  c. You must comply with the conditions in Section 3(a) if You Share
+     all or a substantial portion of the contents of the database.
+
+For the avoidance of doubt, this Section 4 supplements and does not
+replace Your obligations under this Public License where the Licensed
+Rights include other Copyright and Similar Rights.
+
+
+Section 5 -- Disclaimer of Warranties and Limitation of Liability.
+
+  a. UNLESS OTHERWISE SEPARATELY UNDERTAKEN BY THE LICENSOR, TO THE
+     EXTENT POSSIBLE, THE LICENSOR OFFERS THE LICENSED MATERIAL AS-IS
+     AND AS-AVAILABLE, AND MAKES NO REPRESENTATIONS OR WARRANTIES OF
+     ANY KIND CONCERNING THE LICENSED MATERIAL, WHETHER EXPRESS,
+     IMPLIED, STATUTORY, OR OTHER. THIS INCLUDES, WITHOUT LIMITATION,
+     WARRANTIES OF TITLE, MERCHANTABILITY, FITNESS FOR A PARTICULAR
+     PURPOSE, NON-INFRINGEMENT, ABSENCE OF LATENT OR OTHER DEFECTS,
+     ACCURACY, OR THE PRESENCE OR ABSENCE OF ERRORS, WHETHER OR NOT
+     KNOWN OR DISCOVERABLE. WHERE DISCLAIMERS OF WARRANTIES ARE NOT
+     ALLOWED IN FULL OR IN PART, THIS DISCLAIMER MAY NOT APPLY TO YOU.
+
+  b. TO THE EXTENT POSSIBLE, IN NO EVENT WILL THE LICENSOR BE LIABLE
+     TO YOU ON ANY LEGAL THEORY (INCLUDING, WITHOUT LIMITATION,
+     NEGLIGENCE) OR OTHERWISE FOR ANY DIRECT, SPECIAL, INDIRECT,
+     INCIDENTAL, CONSEQUENTIAL, PUNITIVE, EXEMPLARY, OR OTHER LOSSES,
+     COSTS, EXPENSES, OR DAMAGES ARISING OUT OF THIS PUBLIC LICENSE OR
+     USE OF THE LICENSED MATERIAL, EVEN IF THE LICENSOR HAS BEEN
+     ADVISED OF THE POSSIBILITY OF SUCH LOSSES, COSTS, EXPENSES, OR
+     DAMAGES. WHERE A LIMITATION OF LIABILITY IS NOT ALLOWED IN FULL OR
+     IN PART, THIS LIMITATION MAY NOT APPLY TO YOU.
+
+  c. The disclaimer of warranties and limitation of liability provided
+     above shall be interpreted in a manner that, to the extent
+     possible, most closely approximates an absolute disclaimer and
+     waiver of all liability.
+
+
+Section 6 -- Term and Termination.
+
+  a. This Public License applies for the term of the Copyright and
+     Similar Rights licensed here. However, if You fail to comply with
+     this Public License, then Your rights under this Public License
+     terminate automatically.
+
+  b. Where Your right to use the Licensed Material has terminated under
+     Section 6(a), it reinstates:
+
+       1. automatically as of the date the violation is cured, provided
+          it is cured within 30 days of Your discovery of the
+          violation; or
+
+       2. upon express reinstatement by the Licensor.
+
+     For the avoidance of doubt, this Section 6(b) does not affect any
+     right the Licensor may have to seek remedies for Your violations
+     of this Public License.
+
+  c. For the avoidance of doubt, the Licensor may also offer the
+     Licensed Material under separate terms or conditions or stop
+     distributing the Licensed Material at any time; however, doing so
+     will not terminate this Public License.
+
+  d. Sections 1, 5, 6, 7, and 8 survive termination of this Public
+     License.
+
+
+Section 7 -- Other Terms and Conditions.
+
+  a. The Licensor shall not be bound by any additional or different
+     terms or conditions communicated by You unless expressly agreed.
+
+  b. Any arrangements, understandings, or agreements regarding the
+     Licensed Material not stated herein are separate from and
+     independent of the terms and conditions of this Public License.
+
+
+Section 8 -- Interpretation.
+
+  a. For the avoidance of doubt, this Public License does not, and
+     shall not be interpreted to, reduce, limit, restrict, or impose
+     conditions on any use of the Licensed Material that could lawfully
+     be made without permission under this Public License.
+
+  b. To the extent possible, if any provision of this Public License is
+     deemed unenforceable, it shall be automatically reformed to the
+     minimum extent necessary to make it enforceable. If the provision
+     cannot be reformed, it shall be severed from this Public License
+     without affecting the enforceability of the remaining terms and
+     conditions.
+
+  c. No term or condition of this Public License will be waived and no
+     failure to comply consented to unless expressly agreed to by the
+     Licensor.
+
+  d. Nothing in this Public License constitutes or may be interpreted
+     as a limitation upon, or waiver of, any privileges and immunities
+     that apply to the Licensor or You, including from the legal
+     processes of any jurisdiction or authority.
+
+=======================================================================
+
+Creative Commons is not a party to its public
+licenses. Notwithstanding, Creative Commons may elect to apply one of
+its public licenses to material it publishes and in those instances
+will be considered the “Licensor.” The text of the Creative Commons
+public licenses is dedicated to the public domain under the CC0 Public
+Domain Dedication. Except for the limited purpose of indicating that
+material is shared under a Creative Commons public license or as
+otherwise permitted by the Creative Commons policies published at
+creativecommons.org/policies, Creative Commons does not authorize the
+use of the trademark "Creative Commons" or any other trademark or logo
+of Creative Commons without its prior written consent including,
+without limitation, in connection with any unauthorized modifications
+to any of its public licenses or any other arrangements,
+understandings, or agreements concerning use of licensed material. For
+the avoidance of doubt, this paragraph does not form part of the
+public licenses.
+
+Creative Commons may be contacted at creativecommons.org.
+
+
+================================================
+FILE: model_card.md
+================================================
+# Model Card for ImageBind
+
+Multimodal joint embedding model for image/video, text, audio, depth, IMU, and thermal images.
+Input any of the six modalities and get the same sized embedding that can be used for cross-modal and multimodal tasks.
+
+# Model Details
+
+## Model Description
+
+<!-- Provide a longer summary of what this model is/does. -->
+Multimodal joint embedding model for image/video, text, audio, depth, IMU, and thermal images
+
+- **Developed by:** Meta AI
+- **Model type:** Multimodal model
+- **Language(s) (NLP):** en
+- **License:** CC BY-NC-SA 4.0
+- **Resources for more information:**
+    - [GitHub Repo](https://github.com/facebookresearch/ImageBind)
+
+
+# Uses
+
+<!-- Address questions around how the model is intended to be used, including the foreseeable users of the model and those affected by the model. -->
+This model is intended only for research purposes. It provides a joint embedding space for different modalities -- image/video, text, audio, depth, IMU and thermal images.
+We hope that these joint embeddings can be used for a variety of different cross-modal research, e.g., cross-modal retrieval and combining embeddings from different modalities.
+
+## Out-of-Scope Use
+
+<!-- This section addresses misuse, malicious use, and uses that the model will not work well for. -->
+<!-- If the user enters content, print that. If not, but they enter a task in the list, use that. If neither, say "more info needed." -->
+
+This model is *NOT* intended to be used in any real world application -- commercial or otherwise.
+It may produce harmful associations with different inputs.
+The model needs to be investigated and likely re-trained on specific data for any such application.
+The model is expected to work better on web-based visual data since it was trained on such data.
+The text encoder is likely to work only on English language text because of the underlying training datasets.
+
+# Bias, Risks, and Limitations
+
+<!-- This section is meant to convey both technical and sociotechnical limitations. -->
+Open-domain joint embedding models are prone to producing specific biases, e.g., study from [CLIP](https://github.com/openai/CLIP/blob/main/model-card.md#bias-and-fairness).
+Since our model uses such models as initialization, it will exhibit such biases too.
+Moreover, for learning joint embeddings for other modalities such as audio, thermal, depth, and IMU we leverage datasets that are relatively small. These joint embeddings are thus limited to the concepts present in the datasets. For example, the thermal datasets we used are limited to outdoor street scenes, while the depth datasets are limited to indoor scenes.
+
+
+
+# Training Details
+
+## Training Data
+
+<!-- This should link to a Data Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
+
+ImageBind uses image-paired data for training -- (image, X) where X is one of text, audio, depth, IMU or thermal data.
+In particular, we initialize and freeze the image and text encoders using an OpenCLIP ViT-H encoder.
+We train audio embeddings using Audioset, depth embeddings using the SUN RGB-D dataset, IMU using the Ego4D dataset and thermal embeddings using the LLVIP dataset.
+We provide the exact training data details in the paper.
+
+
+## Training Procedure
+
+<!-- This relates heavily to the Technical Specifications. Content here should link to that section when it is relevant to the training procedure. -->
+Please refer to the research paper and github repo for exact details on this.
+
+# Evaluation
+
+## Testing Data, Factors & Metrics
+
+We evaluate the model on a variety of different classification benchmarks for each modality.
+The evaluation details are presented in the paper.
+The models performance is measured using standard classification metrics such as accuracy and mAP.
+
+# Citation
+
+<!-- If there is a paper or blog post introducing the model, the APA and Bibtex information for that should go in this section. -->
+
+**BibTeX:**
+```
+@inproceedings{girdhar2023imagebind,
+  title={ImageBind: One Embedding Space To Bind Them All},
+  author={Girdhar, Rohit and El-Nouby, Alaaeldin and Liu, Zhuang
+and Singh, Mannat and Alwala, Kalyan Vasudev and Joulin, Armand and Misra, Ishan},
+  booktitle={CVPR},
+  year={2023}
+}
+```
+
+
+# Model Card Contact
+
+Please reach out to the authors at: rgirdhar@meta.com imisra@meta.com alaaelnouby@gmail.com
+
+# How to Get Started with the Model
+
+Our github repo provides a simple example to extract embeddings from images, audio etc.
+
+
+
+================================================
+FILE: requirements.txt
+================================================
+torch==1.13.1
+torchvision  # because torch version already specific, the right torchvision will be derived automatically
+torchaudio  # because torch version already specific, the right torchaudio will be derived automatically
+pytorchvideo @ git+https://github.com/facebookresearch/pytorchvideo.git@28fe037d212663c6a24f373b94cc5d478c8c1a1d
+timm==0.6.7
+ftfy
+regex
+einops
+fvcore
+eva-decord==0.6.1
+iopath
+numpy>=1.19
+matplotlib
+types-regex
+mayavi
+cartopy
+
+
+
+================================================
+FILE: setup.py
+================================================
+from setuptools import setup, find_packages
+
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
+setup(
+    name='imagebind',
+    version='0.1.0',
+    packages=find_packages(),
+    package_data={
+        'imagebind': ['bpe/bpe_simple_vocab_16e6.txt.gz'],
+    },
+    description='A brief description of the package',
+    long_description=open('README.md', encoding='utf-8').read(),
+    long_description_content_type="text/markdown",
+    url='https://github.com/facebookresearch/ImageBind',
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'License :: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International',
+    ],
+    install_requires=required,
+    dependency_links=['https://download.pytorch.org/whl/cu113'],
+)
+
+
+
+================================================
+FILE: imagebind/__init__.py
+================================================
+from imagebind import data
+from imagebind.models import imagebind_model
+from imagebind.models.imagebind_model import ModalityType
+
+
+================================================
+FILE: imagebind/data.py
+================================================
+#!/usr/bin/env python3
+# Portions Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+
+import logging
+import math
+import pkg_resources
+
+import torch
+import torch.nn as nn
+import torchaudio
+from PIL import Image
+from pytorchvideo import transforms as pv_transforms
+from pytorchvideo.data.clip_sampling import ConstantClipsPerVideoSampler
+from pytorchvideo.data.encoded_video import EncodedVideo
+from torchvision import transforms
+from torchvision.transforms._transforms_video import NormalizeVideo
+
+from imagebind.models.multimodal_preprocessors import SimpleTokenizer
+
+DEFAULT_AUDIO_FRAME_SHIFT_MS = 10  # in milliseconds
+
+
+def return_bpe_path():
+    return pkg_resources.resource_filename(
+        "imagebind", "bpe/bpe_simple_vocab_16e6.txt.gz"
+    )
+
+
+def waveform2melspec(waveform, sample_rate, num_mel_bins, target_length):
+    # Based on https://github.com/YuanGongND/ast/blob/d7d8b4b8e06cdaeb6c843cdb38794c1c7692234c/src/dataloader.py#L102
+    waveform -= waveform.mean()
+    fbank = torchaudio.compliance.kaldi.fbank(
+        waveform,
+        htk_compat=True,
+        sample_frequency=sample_rate,
+        use_energy=False,
+        window_type="hanning",
+        num_mel_bins=num_mel_bins,
+        dither=0.0,
+        frame_length=25,
+        frame_shift=DEFAULT_AUDIO_FRAME_SHIFT_MS,
+    )
+    # Convert to [mel_bins, num_frames] shape
+    fbank = fbank.transpose(0, 1)
+    # Pad to target_length
+    n_frames = fbank.size(1)
+    p = target_length - n_frames
+    # if p is too large (say >20%), flash a warning
+    if abs(p) / n_frames > 0.2:
+        logging.warning(
+            "Large gap between audio n_frames(%d) and "
+            "target_length (%d). Is the audio_target_length "
+            "setting correct?",
+            n_frames,
+            target_length,
+        )
+    # cut and pad
+    if p > 0:
+        fbank = torch.nn.functional.pad(fbank, (0, p), mode="constant", value=0)
+    elif p < 0:
+        fbank = fbank[:, 0:target_length]
+    # Convert to [1, mel_bins, num_frames] shape, essentially like a 1
+    # channel image
+    fbank = fbank.unsqueeze(0)
+    return fbank
+
+
+def get_clip_timepoints(clip_sampler, duration):
+    # Read out all clips in this video
+    all_clips_timepoints = []
+    is_last_clip = False
+    end = 0.0
+    while not is_last_clip:
+        start, end, _, _, is_last_clip = clip_sampler(end, duration, annotation=None)
+        all_clips_timepoints.append((start, end))
+    return all_clips_timepoints
+
+
+def load_and_transform_vision_data(image_paths, device):
+    if image_paths is None:
+        return None
+
+    image_outputs = []
+
+    data_transform = transforms.Compose(
+        [
+            transforms.Resize(224, interpolation=transforms.InterpolationMode.BICUBIC),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=(0.48145466, 0.4578275, 0.40821073),
+                std=(0.26862954, 0.26130258, 0.27577711),
+            ),
+        ]
+    )
+
+    for image_path in image_paths:
+        with open(image_path, "rb") as fopen:
+            image = Image.open(fopen).convert("RGB")
+
+        image = data_transform(image).to(device)
+        image_outputs.append(image)
+    return torch.stack(image_outputs, dim=0)
+
+
+def load_and_transform_text(text, device):
+    if text is None:
+        return None
+    tokenizer = SimpleTokenizer(bpe_path=return_bpe_path())
+    tokens = [tokenizer(t).unsqueeze(0).to(device) for t in text]
+    tokens = torch.cat(tokens, dim=0)
+    return tokens
+
+
+def load_and_transform_audio_data(
+    audio_paths,
+    device,
+    num_mel_bins=128,
+    target_length=204,
+    sample_rate=16000,
+    clip_duration=2,
+    clips_per_video=3,
+    mean=-4.268,
+    std=9.138,
+):
+    if audio_paths is None:
+        return None
+
+    audio_outputs = []
+    clip_sampler = ConstantClipsPerVideoSampler(
+        clip_duration=clip_duration, clips_per_video=clips_per_video
+    )
+
+    for audio_path in audio_paths:
+        waveform, sr = torchaudio.load(audio_path)
+        if sample_rate != sr:
+            waveform = torchaudio.functional.resample(
+                waveform, orig_freq=sr, new_freq=sample_rate
+            )
+        all_clips_timepoints = get_clip_timepoints(
+            clip_sampler, waveform.size(1) / sample_rate
+        )
+        all_clips = []
+        for clip_timepoints in all_clips_timepoints:
+            waveform_clip = waveform[
+                :,
+                int(clip_timepoints[0] * sample_rate) : int(
+                    clip_timepoints[1] * sample_rate
+                ),
+            ]
+            waveform_melspec = waveform2melspec(
+                waveform_clip, sample_rate, num_mel_bins, target_length
+            )
+            all_clips.append(waveform_melspec)
+
+        normalize = transforms.Normalize(mean=mean, std=std)
+        all_clips = [normalize(ac).to(device) for ac in all_clips]
+
+        all_clips = torch.stack(all_clips, dim=0)
+        audio_outputs.append(all_clips)
+
+    return torch.stack(audio_outputs, dim=0)
+
+
+def crop_boxes(boxes, x_offset, y_offset):
+    """
+    Perform crop on the bounding boxes given the offsets.
+    Args:
+        boxes (ndarray or None): bounding boxes to perform crop. The dimension
+            is `num boxes` x 4.
+        x_offset (int): cropping offset in the x axis.
+        y_offset (int): cropping offset in the y axis.
+    Returns:
+        cropped_boxes (ndarray or None): the cropped boxes with dimension of
+            `num boxes` x 4.
+    """
+    cropped_boxes = boxes.copy()
+    cropped_boxes[:, [0, 2]] = boxes[:, [0, 2]] - x_offset
+    cropped_boxes[:, [1, 3]] = boxes[:, [1, 3]] - y_offset
+
+    return cropped_boxes
+
+
+def uniform_crop(images, size, spatial_idx, boxes=None, scale_size=None):
+    """
+    Perform uniform spatial sampling on the images and corresponding boxes.
+    Args:
+        images (tensor): images to perform uniform crop. The dimension is
+            `num frames` x `channel` x `height` x `width`.
+        size (int): size of height and weight to crop the images.
+        spatial_idx (int): 0, 1, or 2 for left, center, and right crop if width
+            is larger than height. Or 0, 1, or 2 for top, center, and bottom
+            crop if height is larger than width.
+        boxes (ndarray or None): optional. Corresponding boxes to images.
+            Dimension is `num boxes` x 4.
+        scale_size (int): optinal. If not None, resize the images to scale_size before
+            performing any crop.
+    Returns:
+        cropped (tensor): images with dimension of
+            `num frames` x `channel` x `size` x `size`.
+        cropped_boxes (ndarray or None): the cropped boxes with dimension of
+            `num boxes` x 4.
+    """
+    assert spatial_idx in [0, 1, 2]
+    ndim = len(images.shape)
+    if ndim == 3:
+        images = images.unsqueeze(0)
+    height = images.shape[2]
+    width = images.shape[3]
+
+    if scale_size is not None:
+        if width <= height:
+            width, height = scale_size, int(height / width * scale_size)
+        else:
+            width, height = int(width / height * scale_size), scale_size
+        images = torch.nn.functional.interpolate(
+            images,
+            size=(height, width),
+            mode="bilinear",
+            align_corners=False,
+        )
+
+    y_offset = int(math.ceil((height - size) / 2))
+    x_offset = int(math.ceil((width - size) / 2))
+
+    if height > width:
+        if spatial_idx == 0:
+            y_offset = 0
+        elif spatial_idx == 2:
+            y_offset = height - size
+    else:
+        if spatial_idx == 0:
+            x_offset = 0
+        elif spatial_idx == 2:
+            x_offset = width - size
+    cropped = images[:, :, y_offset : y_offset + size, x_offset : x_offset + size]
+    cropped_boxes = crop_boxes(boxes, x_offset, y_offset) if boxes is not None else None
+    if ndim == 3:
+        cropped = cropped.squeeze(0)
+    return cropped, cropped_boxes
+
+
+class SpatialCrop(nn.Module):
+    """
+    Convert the video into 3 smaller clips spatially. Must be used after the
+        temporal crops to get spatial crops, and should be used with
+        -2 in the spatial crop at the slowfast augmentation stage (so full
+        frames are passed in here). Will return a larger list with the
+        3x spatial crops as well.
+    """
+
+    def __init__(self, crop_size: int = 224, num_crops: int = 3):
+        super().__init__()
+        self.crop_size = crop_size
+        if num_crops == 3:
+            self.crops_to_ext = [0, 1, 2]
+            self.flipped_crops_to_ext = []
+        elif num_crops == 1:
+            self.crops_to_ext = [1]
+            self.flipped_crops_to_ext = []
+        else:
+            raise NotImplementedError("Nothing else supported yet")
+
+    def forward(self, videos):
+        """
+        Args:
+            videos: A list of C, T, H, W videos.
+        Returns:
+            videos: A list with 3x the number of elements. Each video converted
+                to C, T, H', W' by spatial cropping.
+        """
+        assert isinstance(videos, list), "Must be a list of videos after temporal crops"
+        assert all([video.ndim == 4 for video in videos]), "Must be (C,T,H,W)"
+        res = []
+        for video in videos:
+            for spatial_idx in self.crops_to_ext:
+                res.append(uniform_crop(video, self.crop_size, spatial_idx)[0])
+            if not self.flipped_crops_to_ext:
+                continue
+            flipped_video = transforms.functional.hflip(video)
+            for spatial_idx in self.flipped_crops_to_ext:
+                res.append(uniform_crop(flipped_video, self.crop_size, spatial_idx)[0])
+        return res
+
+
+def load_and_transform_video_data(
+    video_paths,
+    device,
+    clip_duration=2,
+    clips_per_video=5,
+    sample_rate=16000,
+):
+    if video_paths is None:
+        return None
+
+    video_outputs = []
+    video_transform = transforms.Compose(
+        [
+            pv_transforms.ShortSideScale(224),
+            NormalizeVideo(
+                mean=(0.48145466, 0.4578275, 0.40821073),
+                std=(0.26862954, 0.26130258, 0.27577711),
+            ),
+        ]
+    )
+
+    clip_sampler = ConstantClipsPerVideoSampler(
+        clip_duration=clip_duration, clips_per_video=clips_per_video
+    )
+    frame_sampler = pv_transforms.UniformTemporalSubsample(num_samples=clip_duration)
+
+    for video_path in video_paths:
+        video = EncodedVideo.from_path(
+            video_path,
+            decoder="decord",
+            decode_audio=False,
+            **{"sample_rate": sample_rate},
+        )
+
+        all_clips_timepoints = get_clip_timepoints(clip_sampler, video.duration)
+
+        all_video = []
+        for clip_timepoints in all_clips_timepoints:
+            # Read the clip, get frames
+            clip = video.get_clip(clip_timepoints[0], clip_timepoints[1])
+            if clip is None:
+                raise ValueError("No clip found")
+            video_clip = frame_sampler(clip["video"])
+            video_clip = video_clip / 255.0  # since this is float, need 0-1
+
+            all_video.append(video_clip)
+
+        all_video = [video_transform(clip) for clip in all_video]
+        all_video = SpatialCrop(224, num_crops=3)(all_video)
+
+        all_video = torch.stack(all_video, dim=0)
+        video_outputs.append(all_video)
+
+    return torch.stack(video_outputs, dim=0).to(device)
+
+
+
+================================================
+FILE: imagebind/bpe/bpe_simple_vocab_16e6.txt.gz
+================================================
+[Non-text file]
+
+
+================================================
+FILE: imagebind/models/__init__.py
+================================================
+
+
+
+================================================
+FILE: imagebind/models/helpers.py
+================================================
+#!/usr/bin/env python3
+# Portions Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+
+
+import einops
+import numpy as np
+import torch
+import torch.nn as nn
+
+
+class Normalize(nn.Module):
+    def __init__(self, dim: int) -> None:
+        super().__init__()
+        self.dim = dim
+
+    def forward(self, x):
+        return torch.nn.functional.normalize(x, dim=self.dim, p=2)
+
+
+class LearnableLogitScaling(nn.Module):
+    def __init__(
+        self,
+        logit_scale_init: float = 1 / 0.07,
+        learnable: bool = True,
+        max_logit_scale: float = 100,
+    ) -> None:
+        super().__init__()
+        self.max_logit_scale = max_logit_scale
+        self.logit_scale_init = logit_scale_init
+        self.learnable = learnable
+        log_logit_scale = torch.ones([]) * np.log(self.logit_scale_init)
+        if learnable:
+            self.log_logit_scale = nn.Parameter(log_logit_scale)
+        else:
+            self.register_buffer("log_logit_scale", log_logit_scale)
+
+    def forward(self, x):
+        return torch.clip(self.log_logit_scale.exp(), max=self.max_logit_scale) * x
+
+    def extra_repr(self):
+        st = f"logit_scale_init={self.logit_scale_init},learnable={self.learnable}," \
+             f" max_logit_scale={self.max_logit_scale}"
+        return st
+
+
+class EinOpsRearrange(nn.Module):
+    def __init__(self, rearrange_expr: str, **kwargs) -> None:
+        super().__init__()
+        self.rearrange_expr = rearrange_expr
+        self.kwargs = kwargs
+
+    def forward(self, x):
+        assert isinstance(x, torch.Tensor)
+        return einops.rearrange(x, self.rearrange_expr, **self.kwargs)
+
+
+class VerboseNNModule(nn.Module):
+    """
+    Wrapper around nn.Module that prints registered buffers and parameter names.
+    """
+
+    @staticmethod
+    def get_readable_tensor_repr(name: str, tensor: torch.Tensor) -> str:
+        st = (
+            "("
+            + name
+            + "): "
+            + "tensor("
+            + str(tuple(tensor[1].shape))
+            + ", requires_grad="
+            + str(tensor[1].requires_grad)
+            + ")\n"
+        )
+        return st
+
+    def extra_repr(self) -> str:
+        named_modules = set()
+        for p in self.named_modules():
+            named_modules.update([p[0]])
+        named_modules = list(named_modules)
+
+        string_repr = ""
+        for p in self.named_parameters():
+            name = p[0].split(".")[0]
+            if name not in named_modules:
+                string_repr += self.get_readable_tensor_repr(name, p)
+
+        for p in self.named_buffers():
+            name = p[0].split(".")[0]
+            string_repr += self.get_readable_tensor_repr(name, p)
+
+        return string_repr
+
+
+def cast_if_src_dtype(
+    tensor: torch.Tensor, src_dtype: torch.dtype, tgt_dtype: torch.dtype
+):
+    updated = False
+    if tensor.dtype == src_dtype:
+        tensor = tensor.to(dtype=tgt_dtype)
+        updated = True
+    return tensor, updated
+
+
+class QuickGELU(nn.Module):
+    # From https://github.com/openai/CLIP/blob/d50d76daa670286dd6cacf3bcd80b5e4823fc8e1/clip/model.py#L166
+    def forward(self, x: torch.Tensor):
+        return x * torch.sigmoid(1.702 * x)
+
+
+class SelectElement(nn.Module):
+    def __init__(self, index) -> None:
+        super().__init__()
+        self.index = index
+
+    def forward(self, x):
+        assert x.ndim >= 3
+        return x[:, self.index, ...]
+
+
+class SelectEOSAndProject(nn.Module):
+    """
+    Text Pooling used in OpenCLIP
+    """
+
+    def __init__(self, proj: nn.Module) -> None:
+        super().__init__()
+        self.proj = proj
+
+    def forward(self, x, seq_len):
+        assert x.ndim == 3
+        # x is of shape B x L x D
+        # take features from the eot embedding (eot_token is the highest number in each sequence)
+        x = x[torch.arange(x.shape[0]), seq_len]
+        x = self.proj(x)
+        return x
+
+
+
+================================================
+FILE: imagebind/models/imagebind_model.py
+================================================
+#!/usr/bin/env python3
+# Portions Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+
+
+import os
+from functools import partial
+from types import SimpleNamespace
+
+import torch
+import torch.nn as nn
+
+from imagebind.models.helpers import (EinOpsRearrange, LearnableLogitScaling, Normalize,
+                            SelectElement, SelectEOSAndProject)
+from imagebind.models.multimodal_preprocessors import (AudioPreprocessor,
+                                             IMUPreprocessor, PadIm2Video,
+                                             PatchEmbedGeneric,
+                                             RGBDTPreprocessor,
+                                             SpatioTemporalPosEmbeddingHelper,
+                                             TextPreprocessor,
+                                             ThermalPreprocessor)
+from imagebind.models.transformer import MultiheadAttention, SimpleTransformer
+
+ModalityType = SimpleNamespace(
+    VISION="vision",
+    TEXT="text",
+    AUDIO="audio",
+    THERMAL="thermal",
+    DEPTH="depth",
+    IMU="imu",
+)
+
+
+class ImageBindModel(nn.Module):
+    def __init__(
+        self,
+        video_frames=2,
+        kernel_size=(2, 14, 14),
+        audio_kernel_size=16,
+        audio_stride=10,
+        out_embed_dim=768,
+        vision_embed_dim=1024,
+        vision_num_blocks=24,
+        vision_num_heads=16,
+        audio_embed_dim=768,
+        audio_num_blocks=12,
+        audio_num_heads=12,
+        audio_num_mel_bins=128,
+        audio_target_len=204,
+        audio_drop_path=0.1,
+        text_embed_dim=768,
+        text_num_blocks=12,
+        text_num_heads=12,
+        depth_embed_dim=384,
+        depth_kernel_size=16,
+        depth_num_blocks=12,
+        depth_num_heads=8,
+        depth_drop_path=0.0,
+        thermal_embed_dim=768,
+        thermal_kernel_size=16,
+        thermal_num_blocks=12,
+        thermal_num_heads=12,
+        thermal_drop_path=0.0,
+        imu_embed_dim=512,
+        imu_kernel_size=8,
+        imu_num_blocks=6,
+        imu_num_heads=8,
+        imu_drop_path=0.7,
+    ):
+        super().__init__()
+
+        self.modality_preprocessors = self._create_modality_preprocessors(
+            video_frames,
+            vision_embed_dim,
+            kernel_size,
+            text_embed_dim,
+            audio_embed_dim,
+            audio_kernel_size,
+            audio_stride,
+            audio_num_mel_bins,
+            audio_target_len,
+            depth_embed_dim,
+            depth_kernel_size,
+            thermal_embed_dim,
+            thermal_kernel_size,
+            imu_embed_dim,
+        )
+
+        self.modality_trunks = self._create_modality_trunks(
+            vision_embed_dim,
+            vision_num_blocks,
+            vision_num_heads,
+            text_embed_dim,
+            text_num_blocks,
+            text_num_heads,
+            audio_embed_dim,
+            audio_num_blocks,
+            audio_num_heads,
+            audio_drop_path,
+            depth_embed_dim,
+            depth_num_blocks,
+            depth_num_heads,
+            depth_drop_path,
+            thermal_embed_dim,
+            thermal_num_blocks,
+            thermal_num_heads,
+            thermal_drop_path,
+            imu_embed_dim,
+            imu_num_blocks,
+            imu_num_heads,
+            imu_drop_path,
+        )
+
+        self.modality_heads = self._create_modality_heads(
+            out_embed_dim,
+            vision_embed_dim,
+            text_embed_dim,
+            audio_embed_dim,
+            depth_embed_dim,
+            thermal_embed_dim,
+            imu_embed_dim,
+        )
+
+        self.modality_postprocessors = self._create_modality_postprocessors(
+            out_embed_dim
+        )
+
+    def _create_modality_preprocessors(
+        self,
+        video_frames=2,
+        vision_embed_dim=1024,
+        kernel_size=(2, 14, 14),
+        text_embed_dim=768,
+        audio_embed_dim=768,
+        audio_kernel_size=16,
+        audio_stride=10,
+        audio_num_mel_bins=128,
+        audio_target_len=204,
+        depth_embed_dim=768,
+        depth_kernel_size=16,
+        thermal_embed_dim=768,
+        thermal_kernel_size=16,
+        imu_embed_dim=512,
+    ):
+        rgbt_stem = PatchEmbedGeneric(
+            proj_stem=[
+                PadIm2Video(pad_type="repeat", ntimes=2),
+                nn.Conv3d(
+                    in_channels=3,
+                    kernel_size=kernel_size,
+                    out_channels=vision_embed_dim,
+                    stride=kernel_size,
+                    bias=False,
+                ),
+            ]
+        )
+        rgbt_preprocessor = RGBDTPreprocessor(
+            img_size=[3, video_frames, 224, 224],
+            num_cls_tokens=1,
+            pos_embed_fn=partial(SpatioTemporalPosEmbeddingHelper, learnable=True),
+            rgbt_stem=rgbt_stem,
+            depth_stem=None,
+        )
+
+        text_preprocessor = TextPreprocessor(
+            context_length=77,
+            vocab_size=49408,
+            embed_dim=text_embed_dim,
+            causal_masking=True,
+        )
+
+        audio_stem = PatchEmbedGeneric(
+            proj_stem=[
+                nn.Conv2d(
+                    in_channels=1,
+                    kernel_size=audio_kernel_size,
+                    stride=audio_stride,
+                    out_channels=audio_embed_dim,
+                    bias=False,
+                ),
+            ],
+            norm_layer=nn.LayerNorm(normalized_shape=audio_embed_dim),
+        )
+        audio_preprocessor = AudioPreprocessor(
+            img_size=[1, audio_num_mel_bins, audio_target_len],
+            num_cls_tokens=1,
+            pos_embed_fn=partial(SpatioTemporalPosEmbeddingHelper, learnable=True),
+            audio_stem=audio_stem,
+        )
+
+        depth_stem = PatchEmbedGeneric(
+            [
+                nn.Conv2d(
+                    kernel_size=depth_kernel_size,
+                    in_channels=1,
+                    out_channels=depth_embed_dim,
+                    stride=depth_kernel_size,
+                    bias=False,
+                ),
+            ],
+            norm_layer=nn.LayerNorm(normalized_shape=depth_embed_dim),
+        )
+
+        depth_preprocessor = RGBDTPreprocessor(
+            img_size=[1, 224, 224],
+            num_cls_tokens=1,
+            pos_embed_fn=partial(SpatioTemporalPosEmbeddingHelper, learnable=True),
+            rgbt_stem=None,
+            depth_stem=depth_stem,
+        )
+
+        thermal_stem = PatchEmbedGeneric(
+            [
+                nn.Conv2d(
+                    kernel_size=thermal_kernel_size,
+                    in_channels=1,
+                    out_channels=thermal_embed_dim,
+                    stride=thermal_kernel_size,
+                    bias=False,
+                ),
+            ],
+            norm_layer=nn.LayerNorm(normalized_shape=thermal_embed_dim),
+        )
+        thermal_preprocessor = ThermalPreprocessor(
+            img_size=[1, 224, 224],
+            num_cls_tokens=1,
+            pos_embed_fn=partial(SpatioTemporalPosEmbeddingHelper, learnable=True),
+            thermal_stem=thermal_stem,
+        )
+
+        imu_stem = PatchEmbedGeneric(
+            [
+                nn.Linear(
+                    in_features=48,
+                    out_features=imu_embed_dim,
+                    bias=False,
+                ),
+            ],
+            norm_layer=nn.LayerNorm(normalized_shape=imu_embed_dim),
+        )
+
+        imu_preprocessor = IMUPreprocessor(
+            img_size=[6, 2000],
+            num_cls_tokens=1,
+            kernel_size=8,
+            embed_dim=imu_embed_dim,
+            pos_embed_fn=partial(SpatioTemporalPosEmbeddingHelper, learnable=True),
+            imu_stem=imu_stem,
+        )
+
+        modality_preprocessors = {
+            ModalityType.VISION: rgbt_preprocessor,
+            ModalityType.TEXT: text_preprocessor,
+            ModalityType.AUDIO: audio_preprocessor,
+            ModalityType.DEPTH: depth_preprocessor,
+            ModalityType.THERMAL: thermal_preprocessor,
+            ModalityType.IMU: imu_preprocessor,
+        }
+
+        return nn.ModuleDict(modality_preprocessors)
+
+    def _create_modality_trunks(
+        self,
+        vision_embed_dim=1024,
+        vision_num_blocks=24,
+        vision_num_heads=16,
+        text_embed_dim=768,
+        text_num_blocks=12,
+        text_num_heads=12,
+        audio_embed_dim=768,
+        audio_num_blocks=12,
+        audio_num_heads=12,
+        audio_drop_path=0.0,
+        depth_embed_dim=768,
+        depth_num_blocks=12,
+        depth_num_heads=12,
+        depth_drop_path=0.0,
+        thermal_embed_dim=768,
+        thermal_num_blocks=12,
+        thermal_num_heads=12,
+        thermal_drop_path=0.0,
+        imu_embed_dim=512,
+        imu_num_blocks=6,
+        imu_num_heads=8,
+        imu_drop_path=0.7,
+    ):
+        def instantiate_trunk(
+            embed_dim, num_blocks, num_heads, pre_transformer_ln, add_bias_kv, drop_path
+        ):
+            return SimpleTransformer(
+                embed_dim=embed_dim,
+                num_blocks=num_blocks,
+                ffn_dropout_rate=0.0,
+                drop_path_rate=drop_path,
+                attn_target=partial(
+                    MultiheadAttention,
+                    embed_dim=embed_dim,
+                    num_heads=num_heads,
+                    bias=True,
+                    add_bias_kv=add_bias_kv,
+                ),
+                pre_transformer_layer=nn.Sequential(
+                    nn.LayerNorm(embed_dim, eps=1e-6)
+                    if pre_transformer_ln
+                    else nn.Identity(),
+                    EinOpsRearrange("b l d -> l b d"),
+                ),
+                post_transformer_layer=EinOpsRearrange("l b d -> b l d"),
+            )
+
+        modality_trunks = {}
+        modality_trunks[ModalityType.VISION] = instantiate_trunk(
+            vision_embed_dim,
+            vision_num_blocks,
+            vision_num_heads,
+            pre_transformer_ln=True,
+            add_bias_kv=False,
+            drop_path=0.0,
+        )
+        modality_trunks[ModalityType.TEXT] = instantiate_trunk(
+            text_embed_dim,
+            text_num_blocks,
+            text_num_heads,
+            pre_transformer_ln=False,
+            add_bias_kv=False,
+            drop_path=0.0,
+        )
+        modality_trunks[ModalityType.AUDIO] = instantiate_trunk(
+            audio_embed_dim,
+            audio_num_blocks,
+            audio_num_heads,
+            pre_transformer_ln=False,
+            add_bias_kv=True,
+            drop_path=audio_drop_path,
+        )
+        modality_trunks[ModalityType.DEPTH] = instantiate_trunk(
+            depth_embed_dim,
+            depth_num_blocks,
+            depth_num_heads,
+            pre_transformer_ln=False,
+            add_bias_kv=True,
+            drop_path=depth_drop_path,
+        )
+        modality_trunks[ModalityType.THERMAL] = instantiate_trunk(
+            thermal_embed_dim,
+            thermal_num_blocks,
+            thermal_num_heads,
+            pre_transformer_ln=False,
+            add_bias_kv=True,
+            drop_path=thermal_drop_path,
+        )
+        modality_trunks[ModalityType.IMU] = instantiate_trunk(
+            imu_embed_dim,
+            imu_num_blocks,
+            imu_num_heads,
+            pre_transformer_ln=False,
+            add_bias_kv=True,
+            drop_path=imu_drop_path,
+        )
+
+        return nn.ModuleDict(modality_trunks)
+
+    def _create_modality_heads(
+        self,
+        out_embed_dim,
+        vision_embed_dim,
+        text_embed_dim,
+        audio_embed_dim,
+        depth_embed_dim,
+        thermal_embed_dim,
+        imu_embed_dim,
+    ):
+        modality_heads = {}
+
+        modality_heads[ModalityType.VISION] = nn.Sequential(
+            nn.LayerNorm(normalized_shape=vision_embed_dim, eps=1e-6),
+            SelectElement(index=0),
+            nn.Linear(vision_embed_dim, out_embed_dim, bias=False),
+        )
+
+        modality_heads[ModalityType.TEXT] = SelectEOSAndProject(
+            proj=nn.Sequential(
+                nn.LayerNorm(normalized_shape=text_embed_dim, eps=1e-6),
+                nn.Linear(text_embed_dim, out_embed_dim, bias=False),
+            )
+        )
+
+        modality_heads[ModalityType.AUDIO] = nn.Sequential(
+            nn.LayerNorm(normalized_shape=audio_embed_dim, eps=1e-6),
+            SelectElement(index=0),
+            nn.Linear(audio_embed_dim, out_embed_dim, bias=False),
+        )
+
+        modality_heads[ModalityType.DEPTH] = nn.Sequential(
+            nn.LayerNorm(normalized_shape=depth_embed_dim, eps=1e-6),
+            SelectElement(index=0),
+            nn.Linear(depth_embed_dim, out_embed_dim, bias=False),
+        )
+
+        modality_heads[ModalityType.THERMAL] = nn.Sequential(
+            nn.LayerNorm(normalized_shape=thermal_embed_dim, eps=1e-6),
+            SelectElement(index=0),
+            nn.Linear(thermal_embed_dim, out_embed_dim, bias=False),
+        )
+
+        modality_heads[ModalityType.IMU] = nn.Sequential(
+            nn.LayerNorm(normalized_shape=imu_embed_dim, eps=1e-6),
+            SelectElement(index=0),
+            nn.Dropout(p=0.5),
+            nn.Linear(imu_embed_dim, out_embed_dim, bias=False),
+        )
+
+        return nn.ModuleDict(modality_heads)
+
+    def _create_modality_postprocessors(self, out_embed_dim):
+        modality_postprocessors = {}
+
+        modality_postprocessors[ModalityType.VISION] = Normalize(dim=-1)
+        modality_postprocessors[ModalityType.TEXT] = nn.Sequential(
+            Normalize(dim=-1), LearnableLogitScaling(learnable=True)
+        )
+        modality_postprocessors[ModalityType.AUDIO] = nn.Sequential(
+            Normalize(dim=-1),
+            LearnableLogitScaling(logit_scale_init=20.0, learnable=False),
+        )
+        modality_postprocessors[ModalityType.DEPTH] = nn.Sequential(
+            Normalize(dim=-1),
+            LearnableLogitScaling(logit_scale_init=5.0, learnable=False),
+        )
+        modality_postprocessors[ModalityType.THERMAL] = nn.Sequential(
+            Normalize(dim=-1),
+            LearnableLogitScaling(logit_scale_init=10.0, learnable=False),
+        )
+        modality_postprocessors[ModalityType.IMU] = nn.Sequential(
+            Normalize(dim=-1),
+            LearnableLogitScaling(logit_scale_init=5.0, learnable=False),
+        )
+
+        return nn.ModuleDict(modality_postprocessors)
+
+    def forward(self, inputs):
+        outputs = {}
+        for modality_key, modality_value in inputs.items():
+            reduce_list = (
+                modality_value.ndim >= 5
+            )  # Audio and Video inputs consist of multiple clips
+            if reduce_list:
+                B, S = modality_value.shape[:2]
+                modality_value = modality_value.reshape(
+                    B * S, *modality_value.shape[2:]
+                )
+
+            if modality_value is not None:
+                modality_value = self.modality_preprocessors[modality_key](
+                    **{modality_key: modality_value}
+                )
+                trunk_inputs = modality_value["trunk"]
+                head_inputs = modality_value["head"]
+                modality_value = self.modality_trunks[modality_key](**trunk_inputs)
+                modality_value = self.modality_heads[modality_key](
+                    modality_value, **head_inputs
+                )
+                modality_value = self.modality_postprocessors[modality_key](
+                    modality_value
+                )
+
+                if reduce_list:
+                    modality_value = modality_value.reshape(B, S, -1)
+                    modality_value = modality_value.mean(dim=1)
+
+                outputs[modality_key] = modality_value
+
+        return outputs
+
+
+def imagebind_huge(pretrained=False):
+    model = ImageBindModel(
+        vision_embed_dim=1280,
+        vision_num_blocks=32,
+        vision_num_heads=16,
+        text_embed_dim=1024,
+        text_num_blocks=24,
+        text_num_heads=16,
+        out_embed_dim=1024,
+        audio_drop_path=0.1,
+        imu_drop_path=0.7,
+    )
+
+    if pretrained:
+        if not os.path.exists(".checkpoints/imagebind_huge.pth"):
+            print(
+                "Downloading imagebind weights to .checkpoints/imagebind_huge.pth ..."
+            )
+            os.makedirs(".checkpoints", exist_ok=True)
+            torch.hub.download_url_to_file(
+                "https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth",
+                ".checkpoints/imagebind_huge.pth",
+                progress=True,
+            )
+
+        model.load_state_dict(torch.load(".checkpoints/imagebind_huge.pth"))
+
+    return model
+
+
+
+================================================
+FILE: imagebind/models/multimodal_preprocessors.py
+================================================
+#!/usr/bin/env python3
+# Portions Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+
+import gzip
+import html
+import io
+import math
+from functools import lru_cache
+from typing import Callable, List, Optional, Tuple
+
+import ftfy
+import numpy as np
+import regex as re
+import torch
+import torch.nn as nn
+from iopath.common.file_io import g_pathmgr
+from timm.models.layers import trunc_normal_
+
+from imagebind.models.helpers import VerboseNNModule, cast_if_src_dtype
+
+
+def get_sinusoid_encoding_table(n_position, d_hid):
+    """Sinusoid position encoding table"""
+
+    # TODO: make it with torch instead of numpy
+    def get_position_angle_vec(position):
+        return [
+            position / np.power(10000, 2 * (hid_j // 2) / d_hid)
+            for hid_j in range(d_hid)
+        ]
+
+    sinusoid_table = np.array(
+        [get_position_angle_vec(pos_i) for pos_i in range(n_position)]
+    )
+    sinusoid_table[:, 0::2] = np.sin(sinusoid_table[:, 0::2])  # dim 2i
+    sinusoid_table[:, 1::2] = np.cos(sinusoid_table[:, 1::2])  # dim 2i+1
+
+    return torch.FloatTensor(sinusoid_table).unsqueeze(0)
+
+
+def interpolate_pos_encoding_2d(target_spatial_size, pos_embed):
+    N = pos_embed.shape[1]
+    if N == target_spatial_size:
+        return pos_embed
+    dim = pos_embed.shape[-1]
+    # nn.functional.interpolate doesn't work with bfloat16 so we cast to float32
+    pos_embed, updated = cast_if_src_dtype(pos_embed, torch.bfloat16, torch.float32)
+    pos_embed = nn.functional.interpolate(
+        pos_embed.reshape(1, int(math.sqrt(N)), int(math.sqrt(N)), dim).permute(
+            0, 3, 1, 2
+        ),
+        scale_factor=math.sqrt(target_spatial_size / N),
+        mode="bicubic",
+    )
+    if updated:
+        pos_embed, _ = cast_if_src_dtype(pos_embed, torch.float32, torch.bfloat16)
+    pos_embed = pos_embed.permute(0, 2, 3, 1).view(1, -1, dim)
+    return pos_embed
+
+
+def interpolate_pos_encoding(
+    npatch_per_img,
+    pos_embed,
+    patches_layout,
+    input_shape=None,
+    first_patch_idx=1,
+):
+    assert first_patch_idx == 0 or first_patch_idx == 1, "there is 1 CLS token or none"
+    N = pos_embed.shape[1] - first_patch_idx  # since it's 1 if cls_token exists
+    if npatch_per_img == N:
+        return pos_embed
+
+    assert (
+        patches_layout[-1] == patches_layout[-2]
+    ), "Interpolation of pos embed not supported for non-square layouts"
+
+    class_emb = pos_embed[:, :first_patch_idx]
+    pos_embed = pos_embed[:, first_patch_idx:]
+
+    if input_shape is None or patches_layout[0] == 1:
+        # simple 2D pos embedding, no temporal component
+        pos_embed = interpolate_pos_encoding_2d(npatch_per_img, pos_embed)
+    elif patches_layout[0] > 1:
+        # pos embed has a temporal component
+        assert len(input_shape) == 4, "temporal interpolation not supported"
+        # we only support 2D interpolation in this case
+        num_frames = patches_layout[0]
+        num_spatial_tokens = patches_layout[1] * patches_layout[2]
+        pos_embed = pos_embed.view(1, num_frames, num_spatial_tokens, -1)
+        # interpolate embedding for zeroth frame
+        pos_embed = interpolate_pos_encoding_2d(
+            npatch_per_img, pos_embed[0, 0, ...].unsqueeze(0)
+        )
+    else:
+        raise ValueError("This type of interpolation isn't implemented")
+
+    return torch.cat((class_emb, pos_embed), dim=1)
+
+
+def _get_pos_embedding(
+    npatch_per_img,
+    pos_embed,
+    patches_layout,
+    input_shape,
+    first_patch_idx=1,
+):
+    pos_embed = interpolate_pos_encoding(
+        npatch_per_img,
+        pos_embed,
+        patches_layout,
+        input_shape=input_shape,
+        first_patch_idx=first_patch_idx,
+    )
+    return pos_embed
+
+
+class PatchEmbedGeneric(nn.Module):
+    """
+    PatchEmbed from Hydra
+    """
+
+    def __init__(self, proj_stem, norm_layer: Optional[nn.Module] = None):
+        super().__init__()
+
+        if len(proj_stem) > 1:
+            self.proj = nn.Sequential(*proj_stem)
+        else:
+            # Special case to be able to load pre-trained models that were
+            # trained with a standard stem
+            self.proj = proj_stem[0]
+        self.norm_layer = norm_layer
+
+    def get_patch_layout(self, img_size):
+        with torch.no_grad():
+            dummy_img = torch.zeros(
+                [
+                    1,
+                ]
+                + img_size
+            )
+            dummy_out = self.proj(dummy_img)
+        embed_dim = dummy_out.shape[1]
+        patches_layout = tuple(dummy_out.shape[2:])
+        num_patches = np.prod(patches_layout)
+        return patches_layout, num_patches, embed_dim
+
+    def forward(self, x):
+        x = self.proj(x)
+        # B C (T) H W -> B (T)HW C
+        x = x.flatten(2).transpose(1, 2)
+        if self.norm_layer is not None:
+            x = self.norm_layer(x)
+        return x
+
+
+class SpatioTemporalPosEmbeddingHelper(VerboseNNModule):
+    def __init__(
+        self,
+        patches_layout: List,
+        num_patches: int,
+        num_cls_tokens: int,
+        embed_dim: int,
+        learnable: bool,
+    ) -> None:
+        super().__init__()
+        self.num_cls_tokens = num_cls_tokens
+        self.patches_layout = patches_layout
+        self.num_patches = num_patches
+        self.num_tokens = num_cls_tokens + num_patches
+        self.learnable = learnable
+        if self.learnable:
+            self.pos_embed = nn.Parameter(torch.zeros(1, self.num_tokens, embed_dim))
+            trunc_normal_(self.pos_embed, std=0.02)
+        else:
+            self.register_buffer(
+                "pos_embed", get_sinusoid_encoding_table(self.num_tokens, embed_dim)
+            )
+
+    def get_pos_embedding(self, vision_input, all_vision_tokens):
+        input_shape = vision_input.shape
+        pos_embed = _get_pos_embedding(
+            all_vision_tokens.size(1) - self.num_cls_tokens,
+            pos_embed=self.pos_embed,
+            patches_layout=self.patches_layout,
+            input_shape=input_shape,
+            first_patch_idx=self.num_cls_tokens,
+        )
+        return pos_embed
+
+
+class RGBDTPreprocessor(VerboseNNModule):
+    def __init__(
+        self,
+        rgbt_stem: PatchEmbedGeneric,
+        depth_stem: Optional[PatchEmbedGeneric],
+        img_size: Tuple = (3, 224, 224),
+        num_cls_tokens: int = 1,
+        pos_embed_fn: Optional[Callable] = None,
+        use_type_embed: bool = False,
+        init_param_style: str = "openclip",
+    ) -> None:
+        super().__init__()
+        stem = rgbt_stem if rgbt_stem is not None else depth_stem
+        (
+            self.patches_layout,
+            self.num_patches,
+            self.embed_dim,
+        ) = stem.get_patch_layout(img_size)
+        self.rgbt_stem = rgbt_stem
+        self.depth_stem = depth_stem
+        self.use_pos_embed = pos_embed_fn is not None
+        self.use_type_embed = use_type_embed
+        self.num_cls_tokens = num_cls_tokens
+
+        if self.use_pos_embed:
+            self.pos_embedding_helper = pos_embed_fn(
+                patches_layout=self.patches_layout,
+                num_cls_tokens=num_cls_tokens,
+                num_patches=self.num_patches,
+                embed_dim=self.embed_dim,
+            )
+        if self.num_cls_tokens > 0:
+            self.cls_token = nn.Parameter(
+                torch.zeros(1, self.num_cls_tokens, self.embed_dim)
+            )
+        if self.use_type_embed:
+            self.type_embed = nn.Parameter(torch.zeros(1, 1, self.embed_dim))
+
+        self.init_parameters(init_param_style)
+
+    @torch.no_grad()
+    def init_parameters(self, init_param_style):
+        if init_param_style == "openclip":
+            # OpenCLIP style initialization
+            scale = self.embed_dim**-0.5
+            if self.use_pos_embed:
+                nn.init.normal_(self.pos_embedding_helper.pos_embed)
+                self.pos_embedding_helper.pos_embed *= scale
+
+            if self.num_cls_tokens > 0:
+                nn.init.normal_(self.cls_token)
+                self.cls_token *= scale
+        elif init_param_style == "vit":
+            self.cls_token.data.fill_(0)
+        else:
+            raise ValueError(f"Unknown init {init_param_style}")
+
+        if self.use_type_embed:
+            nn.init.normal_(self.type_embed)
+
+    def tokenize_input_and_cls_pos(self, input, stem, mask):
+        # tokens is of shape B x L x D
+        tokens = stem(input)
+        assert tokens.ndim == 3
+        assert tokens.shape[2] == self.embed_dim
+        B = tokens.shape[0]
+        if self.num_cls_tokens > 0:
+            class_tokens = self.cls_token.expand(
+                B, -1, -1
+            )  # stole class_tokens impl from Phil Wang, thanks
+            tokens = torch.cat((class_tokens, tokens), dim=1)
+        if self.use_pos_embed:
+            pos_embed = self.pos_embedding_helper.get_pos_embedding(input, tokens)
+            tokens = tokens + pos_embed
+        if self.use_type_embed:
+            tokens = tokens + self.type_embed.expand(B, -1, -1)
+        return tokens
+
+    def forward(self, vision=None, depth=None, patch_mask=None):
+        if patch_mask is not None:
+            raise NotImplementedError()
+
+        if vision is not None:
+            vision_tokens = self.tokenize_input_and_cls_pos(
+                vision, self.rgbt_stem, patch_mask
+            )
+
+        if depth is not None:
+            depth_tokens = self.tokenize_input_and_cls_pos(
+                depth, self.depth_stem, patch_mask
+            )
+
+        # aggregate tokens
+        if vision is not None and depth is not None:
+            final_tokens = vision_tokens + depth_tokens
+        else:
+            final_tokens = vision_tokens if vision is not None else depth_tokens
+        return_dict = {
+            "trunk": {
+                "tokens": final_tokens,
+            },
+            "head": {},
+        }
+        return return_dict
+
+
+class AudioPreprocessor(RGBDTPreprocessor):
+    def __init__(self, audio_stem: PatchEmbedGeneric, **kwargs) -> None:
+        super().__init__(rgbt_stem=audio_stem, depth_stem=None, **kwargs)
+
+    def forward(self, audio=None):
+        return super().forward(vision=audio)
+
+
+class ThermalPreprocessor(RGBDTPreprocessor):
+    def __init__(self, thermal_stem: PatchEmbedGeneric, **kwargs) -> None:
+        super().__init__(rgbt_stem=thermal_stem, depth_stem=None, **kwargs)
+
+    def forward(self, thermal=None):
+        return super().forward(vision=thermal)
+
+
+def build_causal_attention_mask(context_length):
+    # lazily create causal attention mask, with full attention between the vision tokens
+    # pytorch uses additive attention mask; fill with -inf
+    mask = torch.empty(context_length, context_length, requires_grad=False)
+    mask.fill_(float("-inf"))
+    mask.triu_(1)  # zero out the lower diagonal
+    return mask
+
+
+class TextPreprocessor(VerboseNNModule):
+    def __init__(
+        self,
+        vocab_size: int,
+        context_length: int,
+        embed_dim: int,
+        causal_masking: bool,
+        supply_seq_len_to_head: bool = True,
+        num_cls_tokens: int = 0,
+        init_param_style: str = "openclip",
+    ) -> None:
+        super().__init__()
+        self.vocab_size = vocab_size
+        self.context_length = context_length
+        self.token_embedding = nn.Embedding(vocab_size, embed_dim)
+        self.pos_embed = nn.Parameter(
+            torch.empty(1, self.context_length + num_cls_tokens, embed_dim)
+        )
+        self.causal_masking = causal_masking
+        if self.causal_masking:
+            mask = build_causal_attention_mask(self.context_length)
+            # register the mask as a buffer so it can be moved to the right device
+            self.register_buffer("mask", mask)
+
+        self.supply_seq_len_to_head = supply_seq_len_to_head
+        self.num_cls_tokens = num_cls_tokens
+        self.embed_dim = embed_dim
+        if num_cls_tokens > 0:
+            assert self.causal_masking is False, "Masking + CLS token isn't implemented"
+            self.cls_token = nn.Parameter(
+                torch.zeros(1, self.num_cls_tokens, embed_dim)
+            )
+
+        self.init_parameters(init_param_style)
+
+    @torch.no_grad()
+    def init_parameters(self, init_param_style="openclip"):
+        # OpenCLIP style initialization
+        nn.init.normal_(self.token_embedding.weight, std=0.02)
+        nn.init.normal_(self.pos_embed, std=0.01)
+
+        if init_param_style == "openclip":
+            # OpenCLIP style initialization
+            scale = self.embed_dim**-0.5
+            if self.num_cls_tokens > 0:
+                nn.init.normal_(self.cls_token)
+                self.cls_token *= scale
+        elif init_param_style == "vit":
+            self.cls_token.data.fill_(0)
+        else:
+            raise ValueError(f"Unknown init {init_param_style}")
+
+    def forward(self, text):
+        # text tokens are of shape B x L x D
+        text_tokens = self.token_embedding(text)
+        # concat CLS tokens if any
+        if self.num_cls_tokens > 0:
+            B = text_tokens.shape[0]
+            class_tokens = self.cls_token.expand(
+                B, -1, -1
+            )  # stole class_tokens impl from Phil Wang, thanks
+            text_tokens = torch.cat((class_tokens, text_tokens), dim=1)
+        text_tokens = text_tokens + self.pos_embed
+        return_dict = {
+            "trunk": {
+                "tokens": text_tokens,
+            },
+            "head": {},
+        }
+        # Compute sequence length after adding CLS tokens
+        if self.supply_seq_len_to_head:
+            text_lengths = text.argmax(dim=-1)
+            return_dict["head"] = {
+                "seq_len": text_lengths,
+            }
+        if self.causal_masking:
+            return_dict["trunk"].update({"attn_mask": self.mask})
+        return return_dict
+
+
+class Im2Video(nn.Module):
+    """Convert an image into a trivial video."""
+
+    def __init__(self, time_dim=2):
+        super().__init__()
+        self.time_dim = time_dim
+
+    def forward(self, x):
+        if x.ndim == 4:
+            # B, C, H, W -> B, C, T, H, W
+            return x.unsqueeze(self.time_dim)
+        elif x.ndim == 5:
+            return x
+        else:
+            raise ValueError(f"Dimension incorrect {x.shape}")
+
+
+class PadIm2Video(Im2Video):
+    def __init__(self, ntimes, pad_type, time_dim=2):
+        super().__init__(time_dim=time_dim)
+        assert ntimes > 0
+        assert pad_type in ["zero", "repeat"]
+        self.ntimes = ntimes
+        self.pad_type = pad_type
+
+    def forward(self, x):
+        x = super().forward(x)
+        if x.shape[self.time_dim] == 1:
+            if self.pad_type == "repeat":
+                new_shape = [1] * len(x.shape)
+                new_shape[self.time_dim] = self.ntimes
+                x = x.repeat(new_shape)
+            elif self.pad_type == "zero":
+                padarg = [0, 0] * len(x.shape)
+                padarg[2 * self.time_dim + 1] = self.ntimes - x.shape[self.time_dim]
+                x = nn.functional.pad(x, padarg)
+        return x
+
+
+# Modified from github.com/openai/CLIP
+@lru_cache()
+def bytes_to_unicode():
+    """
+    Returns list of utf-8 byte and a corresponding list of unicode strings.
+    The reversible bpe codes work on unicode strings.
+    This means you need a large # of unicode characters in your vocab if you want to avoid UNKs.
+    When you're at something like a 10B token dataset you end up needing around 5K for decent coverage.
+    This is a signficant percentage of your normal, say, 32K bpe vocab.
+    To avoid that, we want lookup tables between utf-8 bytes and unicode strings.
+    And avoids mapping to whitespace/control characters the bpe code barfs on.
+    """
+    bs = (
+        list(range(ord("!"), ord("~") + 1))
+        + list(range(ord("¡"), ord("¬") + 1))
+        + list(range(ord("®"), ord("ÿ") + 1))
+    )
+    cs = bs[:]
+    n = 0
+    for b in range(2**8):
+        if b not in bs:
+            bs.append(b)
+            cs.append(2**8 + n)
+            n += 1
+    cs = [chr(n) for n in cs]
+    return dict(zip(bs, cs))
+
+
+def get_pairs(word):
+    """Return set of symbol pairs in a word.
+    Word is represented as tuple of symbols (symbols being variable-length strings).
+    """
+    pairs = set()
+    prev_char = word[0]
+    for char in word[1:]:
+        pairs.add((prev_char, char))
+        prev_char = char
+    return pairs
+
+
+def basic_clean(text):
+    text = ftfy.fix_text(text)
+    text = html.unescape(html.unescape(text))
+    return text.strip()
+
+
+def whitespace_clean(text):
+    text = re.sub(r"\s+", " ", text)
+    text = text.strip()
+    return text
+
+
+class SimpleTokenizer(object):
+    def __init__(self, bpe_path: str, context_length=77):
+        self.byte_encoder = bytes_to_unicode()
+        self.byte_decoder = {v: k for k, v in self.byte_encoder.items()}
+
+        with g_pathmgr.open(bpe_path, "rb") as fh:
+            bpe_bytes = io.BytesIO(fh.read())
+            merges: List[str] = gzip.open(bpe_bytes).read().decode("utf-8").split("\n")
+        merges = merges[1 : 49152 - 256 - 2 + 1]
+        merges: List[Tuple[str, ...]] = [tuple(merge.split()) for merge in merges]
+        vocab = list(bytes_to_unicode().values())
+        vocab = vocab + [v + "</w>" for v in vocab]
+        for merge in merges:
+            vocab.append("".join(merge))
+        vocab.extend(["<|startoftext|>", "<|endoftext|>"])
+        self.encoder = dict(zip(vocab, range(len(vocab))))
+        self.decoder = {v: k for k, v in self.encoder.items()}
+        self.bpe_ranks = dict(zip(merges, range(len(merges))))
+        self.cache = {
+            "<|startoftext|>": "<|startoftext|>",
+            "<|endoftext|>": "<|endoftext|>",
+        }
+        self.pat = re.compile(
+            r"""<\|startoftext\|>|<\|endoftext\|>|'s|'t|'re|'ve|'m|'ll|'d|[\p{L}]+|[\p{N}]|[^\s\p{L}\p{N}]+""",
+            re.IGNORECASE,
+        )
+        self.context_length = context_length
+
+    def bpe(self, token):
+        if token in self.cache:
+            return self.cache[token]
+        word = tuple(token[:-1]) + (token[-1] + "</w>",)
+        pairs = get_pairs(word)
+
+        if not pairs:
+            return token + "</w>"
+
+        while True:
+            bigram = min(pairs, key=lambda pair: self.bpe_ranks.get(pair, float("inf")))
+            if bigram not in self.bpe_ranks:
+                break
+            first, second = bigram
+            new_word = []
+            i = 0
+            while i < len(word):
+                try:
+                    j = word.index(first, i)
+                    new_word.extend(word[i:j])
+                    i = j
+                except:
+                    new_word.extend(word[i:])
+                    break
+
+                if word[i] == first and i < len(word) - 1 and word[i + 1] == second:
+                    new_word.append(first + second)
+                    i += 2
+                else:
+                    new_word.append(word[i])
+                    i += 1
+            new_word = tuple(new_word)
+            word = new_word
+            if len(word) == 1:
+                break
+            else:
+                pairs = get_pairs(word)
+        word = " ".join(word)
+        self.cache[token] = word
+        return word
+
+    def encode(self, text):
+        bpe_tokens = []
+        text = whitespace_clean(basic_clean(text)).lower()
+        for token in re.findall(self.pat, text):
+            token = "".join(self.byte_encoder[b] for b in token.encode("utf-8"))
+            bpe_tokens.extend(
+                self.encoder[bpe_token] for bpe_token in self.bpe(token).split(" ")
+            )
+        return bpe_tokens
+
+    def decode(self, tokens):
+        text = "".join([self.decoder[token] for token in tokens])
+        text = (
+            bytearray([self.byte_decoder[c] for c in text])
+            .decode("utf-8", errors="replace")
+            .replace("</w>", " ")
+        )
+        return text
+
+    def __call__(self, texts, context_length=None):
+        if not context_length:
+            context_length = self.context_length
+
+        if isinstance(texts, str):
+            texts = [texts]
+
+        sot_token = self.encoder["<|startoftext|>"]
+        eot_token = self.encoder["<|endoftext|>"]
+        all_tokens = [[sot_token] + self.encode(text) + [eot_token] for text in texts]
+        result = torch.zeros(len(all_tokens), context_length, dtype=torch.long)
+
+        for i, tokens in enumerate(all_tokens):
+            tokens = tokens[:context_length]
+            result[i, : len(tokens)] = torch.tensor(tokens)
+
+        if len(result) == 1:
+            return result[0]
+        return result
+
+
+class IMUPreprocessor(VerboseNNModule):
+    def __init__(
+        self,
+        kernel_size: int,
+        imu_stem: PatchEmbedGeneric,
+        embed_dim: int,
+        img_size: Tuple = (6, 2000),
+        num_cls_tokens: int = 1,
+        pos_embed_fn: Optional[Callable] = None,
+        init_param_style: str = "openclip",
+    ) -> None:
+        super().__init__()
+        self.imu_stem = imu_stem
+        self.embed_dim = embed_dim
+        self.use_pos_embed = pos_embed_fn is not None
+        self.num_cls_tokens = num_cls_tokens
+        self.kernel_size = kernel_size
+        self.pos_embed = nn.Parameter(
+            torch.empty(1, (img_size[1] // kernel_size) + num_cls_tokens, embed_dim)
+        )
+
+        if self.num_cls_tokens > 0:
+            self.cls_token = nn.Parameter(
+                torch.zeros(1, self.num_cls_tokens, self.embed_dim)
+            )
+
+        self.init_parameters(init_param_style)
+
+    @torch.no_grad()
+    def init_parameters(self, init_param_style):
+        nn.init.normal_(self.pos_embed, std=0.01)
+
+        if init_param_style == "openclip":
+            # OpenCLIP style initialization
+            scale = self.embed_dim**-0.5
+
+            if self.num_cls_tokens > 0:
+                nn.init.normal_(self.cls_token)
+                self.cls_token *= scale
+        elif init_param_style == "vit":
+            self.cls_token.data.fill_(0)
+        else:
+            raise ValueError(f"Unknown init {init_param_style}")
+
+    def tokenize_input_and_cls_pos(self, input, stem):
+        # tokens is of shape B x L x D
+        tokens = stem.norm_layer(stem.proj(input))
+        assert tokens.ndim == 3
+        assert tokens.shape[2] == self.embed_dim
+        B = tokens.shape[0]
+        if self.num_cls_tokens > 0:
+            class_tokens = self.cls_token.expand(
+                B, -1, -1
+            )  # stole class_tokens impl from Phil Wang, thanks
+            tokens = torch.cat((class_tokens, tokens), dim=1)
+        if self.use_pos_embed:
+            tokens = tokens + self.pos_embed
+        return tokens
+
+    def forward(self, imu):
+        # Patchify
+        imu = imu.unfold(
+            -1,
+            self.kernel_size,
+            self.kernel_size,
+        ).permute(0, 2, 1, 3)
+        imu = imu.reshape(imu.size(0), imu.size(1), -1)
+
+        imu_tokens = self.tokenize_input_and_cls_pos(
+            imu,
+            self.imu_stem,
+        )
+
+        return_dict = {
+            "trunk": {
+                "tokens": imu_tokens,
+            },
+            "head": {},
+        }
+        return return_dict
+
+
+
+================================================
+FILE: imagebind/models/transformer.py
+================================================
+#!/usr/bin/env python3
+# Portions Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+
+# Code modified from
+# https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py ;
+# https://github.com/facebookresearch/deit/blob/main/models.py
+# and https://github.com/facebookresearch/vissl/blob/main/vissl/models/trunks/vision_transformer.py
+
+
+from functools import partial
+from typing import Callable, List, Optional
+
+import torch
+import torch.nn as nn
+import torch.utils.checkpoint as checkpoint
+from timm.models.layers import DropPath, trunc_normal_
+
+
+class Attention(nn.Module):
+    def __init__(
+        self,
+        dim,
+        num_heads=8,
+        qkv_bias=False,
+        qk_scale=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+    ):
+        super().__init__()
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        # NOTE scale factor was wrong in my original version,
+        # can set manually to be compat with prev weights
+        self.scale = qk_scale or head_dim**-0.5
+
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+    def forward(self, x):
+        B, N, C = x.shape
+        qkv = (
+            self.qkv(x)
+            .reshape(B, N, 3, self.num_heads, C // self.num_heads)
+            .permute(2, 0, 3, 1, 4)
+        )
+        q, k, v = (
+            qkv[0],
+            qkv[1],
+            qkv[2],
+        )  # make torchscript happy (cannot use tensor as tuple)
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+
+        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = self.proj(x)
+        x = self.proj_drop(x)
+        return x
+
+
+class Mlp(nn.Module):
+    def __init__(
+        self,
+        in_features,
+        hidden_features=None,
+        out_features=None,
+        act_layer=nn.GELU,
+        drop=0.0,
+    ):
+        super().__init__()
+        out_features = out_features or in_features
+        hidden_features = hidden_features or in_features
+        self.fc1 = nn.Linear(in_features, hidden_features)
+        self.act = act_layer()
+        self.fc2 = nn.Linear(hidden_features, out_features)
+        self.drop = nn.Dropout(drop)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.act(x)
+        x = self.drop(x)
+        x = self.fc2(x)
+        x = self.drop(x)
+        return x
+
+
+class MultiheadAttention(nn.MultiheadAttention):
+    def forward(self, x: torch.Tensor, attn_mask: torch.Tensor):
+        return super().forward(x, x, x, need_weights=False, attn_mask=attn_mask)[0]
+
+
+class ViTAttention(Attention):
+    def forward(self, x: torch.Tensor, attn_mask: torch.Tensor):
+        assert attn_mask is None
+        return super().forward(x)
+
+
+class BlockWithMasking(nn.Module):
+    def __init__(
+        self,
+        dim: int,
+        attn_target: Callable,
+        mlp_ratio: int = 4,
+        act_layer: Callable = nn.GELU,
+        norm_layer: Callable = nn.LayerNorm,
+        ffn_dropout_rate: float = 0.0,
+        drop_path: float = 0.0,
+        layer_scale_type: Optional[str] = None,
+        layer_scale_init_value: float = 1e-4,
+    ):
+        super().__init__()
+
+        assert not isinstance(
+            attn_target, nn.Module
+        ), "attn_target should be a Callable. Otherwise attn_target is shared across blocks!"
+        self.attn = attn_target()
+        if drop_path > 0.0:
+            self.drop_path = DropPath(drop_path)
+        else:
+            self.drop_path = nn.Identity()
+        self.norm_1 = norm_layer(dim)
+        mlp_hidden_dim = int(mlp_ratio * dim)
+        self.mlp = Mlp(
+            in_features=dim,
+            hidden_features=mlp_hidden_dim,
+            act_layer=act_layer,
+            drop=ffn_dropout_rate,
+        )
+        self.norm_2 = norm_layer(dim)
+        self.layer_scale_type = layer_scale_type
+        if self.layer_scale_type is not None:
+            assert self.layer_scale_type in [
+                "per_channel",
+                "scalar",
+            ], f"Found Layer scale type {self.layer_scale_type}"
+            if self.layer_scale_type == "per_channel":
+                # one gamma value per channel
+                gamma_shape = [1, 1, dim]
+            elif self.layer_scale_type == "scalar":
+                # single gamma value for all channels
+                gamma_shape = [1, 1, 1]
+            # two gammas: for each part of the fwd in the encoder
+            self.layer_scale_gamma1 = nn.Parameter(
+                torch.ones(size=gamma_shape) * layer_scale_init_value,
+                requires_grad=True,
+            )
+            self.layer_scale_gamma2 = nn.Parameter(
+                torch.ones(size=gamma_shape) * layer_scale_init_value,
+                requires_grad=True,
+            )
+
+    def forward(self, x: torch.Tensor, attn_mask: torch.Tensor):
+        if self.layer_scale_type is None:
+            x = x + self.drop_path(self.attn(self.norm_1(x), attn_mask))
+            x = x + self.drop_path(self.mlp(self.norm_2(x)))
+        else:
+            x = (
+                x
+                + self.drop_path(self.attn(self.norm_1(x), attn_mask))
+                * self.layer_scale_gamma1
+            )
+            x = x + self.drop_path(self.mlp(self.norm_2(x))) * self.layer_scale_gamma2
+        return x
+
+
+_LAYER_NORM = partial(nn.LayerNorm, eps=1e-6)
+
+
+class SimpleTransformer(nn.Module):
+    def __init__(
+        self,
+        attn_target: Callable,
+        embed_dim: int,
+        num_blocks: int,
+        block: Callable = BlockWithMasking,
+        pre_transformer_layer: Optional[Callable] = None,
+        post_transformer_layer: Optional[Callable] = None,
+        drop_path_rate: float = 0.0,
+        drop_path_type: str = "progressive",
+        norm_layer: Callable = _LAYER_NORM,
+        mlp_ratio: int = 4,
+        ffn_dropout_rate: float = 0.0,
+        layer_scale_type: Optional[str] = None,  # from cait; possible values are None, "per_channel", "scalar"
+        layer_scale_init_value: float = 1e-4,  # from cait; float
+        weight_init_style: str = "jax",  # possible values jax or pytorch
+    ):
+        """
+        Simple Transformer with the following features
+        1. Supports masked attention
+        2. Supports DropPath
+        3. Supports LayerScale
+        4. Supports Dropout in Attention and FFN
+        5. Makes few assumptions about the input except that it is a Tensor
+        """
+        super().__init__()
+        self.pre_transformer_layer = pre_transformer_layer
+        if drop_path_type == "progressive":
+            dpr = [x.item() for x in torch.linspace(0, drop_path_rate, num_blocks)]
+        elif drop_path_type == "uniform":
+            dpr = [drop_path_rate for i in range(num_blocks)]
+        else:
+            raise ValueError(f"Unknown drop_path_type: {drop_path_type}")
+
+        self.blocks = nn.Sequential(
+            *[
+                block(
+                    dim=embed_dim,
+                    attn_target=attn_target,
+                    mlp_ratio=mlp_ratio,
+                    ffn_dropout_rate=ffn_dropout_rate,
+                    drop_path=dpr[i],
+                    norm_layer=norm_layer,
+                    layer_scale_type=layer_scale_type,
+                    layer_scale_init_value=layer_scale_init_value,
+                )
+                for i in range(num_blocks)
+            ]
+        )
+        self.post_transformer_layer = post_transformer_layer
+        self.weight_init_style = weight_init_style
+        self.apply(self._init_weights)
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            if self.weight_init_style == "jax":
+                # Based on MAE and official Jax ViT implementation
+                torch.nn.init.xavier_uniform_(m.weight)
+            elif self.weight_init_style == "pytorch":
+                # PyTorch ViT uses trunc_normal_
+                trunc_normal_(m.weight, std=0.02)
+
+            if m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+        elif isinstance(m, (nn.LayerNorm)):
+            nn.init.constant_(m.bias, 0)
+            nn.init.constant_(m.weight, 1.0)
+
+    def forward(
+        self,
+        tokens: torch.Tensor,
+        attn_mask: torch.Tensor = None,
+        use_checkpoint: bool = False,
+        checkpoint_every_n: int = 1,
+        checkpoint_blk_ids: Optional[List[int]] = None,
+    ):
+        """
+        Inputs
+        - tokens: data of shape N x L x D (or L x N x D depending on the attention implementation)
+        - attn: mask of shape L x L
+
+        Output
+        - x: data of shape N x L x D (or L x N x D depending on the attention implementation)
+        """
+        if self.pre_transformer_layer:
+            tokens = self.pre_transformer_layer(tokens)
+        if use_checkpoint and checkpoint_blk_ids is None:
+            checkpoint_blk_ids = [
+                blk_id
+                for blk_id in range(len(self.blocks))
+                if blk_id % checkpoint_every_n == 0
+            ]
+        if checkpoint_blk_ids:
+            checkpoint_blk_ids = set(checkpoint_blk_ids)
+        for blk_id, blk in enumerate(self.blocks):
+            if use_checkpoint and blk_id in checkpoint_blk_ids:
+                tokens = checkpoint.checkpoint(
+                    blk, tokens, attn_mask, use_reentrant=False
+                )
+            else:
+                tokens = blk(tokens, attn_mask=attn_mask)
+        if self.post_transformer_layer:
+            tokens = self.post_transformer_layer(tokens)
+        return tokens
+
+
+
