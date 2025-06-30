@@ -61,8 +61,6 @@ While the code examples are primarily written in Python/JS, the concepts can be 
 | [Knowledge_Graphs_with_Structured_Outputs](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Knowledge_Graphs_with_Structured_Outputs.ipynb) | Get LLMs to generate knowledge graphs | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Knowledge_Graphs_with_Structured_Outputs.ipynb) |
 | [Getting_started_with_Llama4](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Getting_started_with_Llama4.ipynb) | Get started with Llama 4 models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Getting_started_with_Llama4.ipynb) |
 | [Batch_Inference_Evals](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Batch_Inference_Evals.ipynb) | Batch inference and evaluation workflows | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Batch_Inference_Evals.ipynb) |
-| Integrations | | |
-| [Tool_use_with_Toolhouse](https://github.com/togethercomputer/together-cookbook/blob/main/Integrations/Tool_use_with_Toolhouse.ipynb) | Using Together AI with Toolhouse integration | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Integrations/Tool_use_with_Toolhouse.ipynb) |
 
 ## Explore Further
 
