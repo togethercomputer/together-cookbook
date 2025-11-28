@@ -1,6 +1,6 @@
 # GRPO BlackJack on Together Instant Cluster
 
-This recipe shows how to run the full PyTorch stack (OpenEnv + TorchForge + Monarch) on a Together Instant Cluster and train Qwen with GRPO to play BlackJack.
+This recipe shows how to run the full PyTorch stack (OpenEnv + TorchForge + Monarch) on a Together Instant Cluster and train Qwen with GRPO to play BlackJack. It is inspired by the OpenEnv example from this [repo](https://github.com/meta-pytorch/OpenEnv/tree/main/examples/grpo_blackjack).
 
 ## Prerequisites
 
