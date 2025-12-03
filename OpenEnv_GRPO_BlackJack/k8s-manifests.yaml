@@ -1,0 +1,111 @@
+---
+# Persistent Volume Claim for shared storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openenv-storage
+spec:
+  storageClassName: vast-static
+  volumeName: together-openenv-integration  # Change to match your PV
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# GPU Workspace Pod (mounts shared volume)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: grpo-workspace
+spec:
+  restartPolicy: Never
+  containers:
+    - name: workspace
+      image: pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
+      command: ["/bin/bash", "-c", "sleep infinity"]
+      resources:
+        requests:
+          nvidia.com/gpu: 4
+          cpu: "32"
+          memory: 64Gi
+        limits:
+          nvidia.com/gpu: 4
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+        - name: shm
+          mountPath: /dev/shm
+  volumes:
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: openenv-storage
+    - name: shm
+      emptyDir:
+        medium: Memory
+        sizeLimit: 32Gi
+
+---
+# OpenSpiel BlackJack Server Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blackjack-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blackjack-server
+  template:
+    metadata:
+      labels:
+        app: blackjack-server
+    spec:
+      containers:
+      - name: server
+        image: pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -e
+            cd /workspace
+            apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+            if [ ! -d OpenEnv ]; then
+              git clone https://github.com/meta-pytorch/OpenEnv.git
+            fi
+            pip install -U pip
+            pip install open_spiel fastapi uvicorn pyyaml requests pydantic
+            export PYTHONPATH="/workspace/OpenEnv/src:${PYTHONPATH}"
+            export OPENSPIEL_GAME=blackjack
+            uvicorn envs.openspiel_env.server.app:app --host 0.0.0.0 --port 8004
+        ports:
+        - containerPort: 8004
+        volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+        - name: shm
+          mountPath: /dev/shm
+      volumes:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: openenv-storage
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 2Gi
+
+---
+# BlackJack Server Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: blackjack-server
+spec:
+  selector:
+    app: blackjack-server
+  ports:
+  - port: 8004
+    targetPort: 8004
+  type: ClusterIP
+
