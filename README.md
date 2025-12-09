@@ -1,4 +1,4 @@
-<img src="images\together.gif" width="100%"/>
+<img src="images/together.gif" width="100%"/>
 
 <!-- Links -->
 <p align="center">
@@ -20,51 +20,136 @@ We welcome contributions to this repository! If you have a cookbook you'd like t
 
 To make the most of the examples in this cookbook, you'll need a Together AI API key (sign up for free [here](https://api.together.ai/signin)).
 
-While the code examples are primarily written in Python/JS, the concepts can be adapted to any programming language that supports interaction with the Together API.
+While the code examples are primarily written in Python, the concepts can be adapted to any programming language that supports interaction with the Together API.
 
-## Cookbooks
+---
 
-| Cookbook | Description | Open |
+## 🚀 [Quickstarts](Quickstarts/)
+
+Get started with Together AI in minutes
+
+| Notebook | Description | Open |
 | -------- | ----------- | ---- |
-| Agents | | |
-| [Serial Chain Agent ](https://github.com/togethercomputer/together-cookbook/blob/main/Agents/Serial_Chain_Agent_Workflow.ipynb) | Chain multiple LLM calls sequentially to process complex tasks. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Serial_Chain_Agent_Workflow.ipynb) |
-| [Conditional Router Agent Workflow ](https://github.com/togethercomputer/together-cookbook/blob/main/Agents/Conditional_Router_Agent_Workflow.ipynb) | Create an agent that routes tasks to specialized models. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Conditional_Router_Agent_Workflow.ipynb) |
-| [Parallel Agent Workflow ](https://github.com/togethercomputer/together-cookbook/blob/main/Agents/Parallel_Agent_Workflow.ipynb) | Run multiple LLMs in parallel and aggregate their solutions. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Parallel_Agent_Workflow.ipynb) |
-| [Orchestrator Subtask Agent Workflow ](https://github.com/togethercomputer/together-cookbook/blob/main/Agents/Parallel_Subtask_Agent_Workflow.ipynb) | Break down tasks into parallel subtasks to be executed by LLMs. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Parallel_Subtask_Agent_Workflow.ipynb) |
-| [Looping Agent Workflow](https://github.com/togethercomputer/together-cookbook/blob/main/Agents/Looping_Agent_Workflow.ipynb) | Build an agent that iteratively improves responses | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Looping_Agent_Workflow.ipynb) |
-| [Together Open Deep Research](https://github.com/togethercomputer/together-cookbook/blob/main/Agents/Together_Open_Deep_Research_CookBook.ipynb) | An Open Source Deep-Research Implementation with Multi-Step Web Search | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Together_Open_Deep_Research_CookBook.ipynb) |
-| Evals | | |
-| [Classification_Evals](https://github.com/togethercomputer/together-cookbook/blob/main/Evals/Classification_Evals.ipynb) | LLM-as-a-Judge for safety evaluation and classification tasks | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Classification_Evals.ipynb) |
-| [Compare_Evals](https://github.com/togethercomputer/together-cookbook/blob/main/Evals/Compare_Evals.ipynb) | Head-to-head model comparison on summarization tasks | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Compare_Evals.ipynb) |
-| [Prompt_Evals](https://github.com/togethercomputer/together-cookbook/blob/main/Evals/Prompt_Evals.ipynb) | Prompt optimization through A/B testing and comparison | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Prompt_Evals.ipynb) |
-| Fine-tuning | | |
-| [End-to-end Fine-tuning Guide](https://github.com/togethercomputer/together-cookbook/blob/main/Finetuning/Finetuning_Guide.ipynb) | Fine-tuning basics and best practices. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Finetuning_Guide.ipynb) [![](https://uohmivykqgnnbiouffke.supabase.co/storage/v1/object/public/landingpage/youtubebadge.svg)](https://youtu.be/AKO7YDcwhiQ?si=ZcOGdDeTRelwIqXd) |
-| [LoRA Inference and Fine-tuning](https://github.com/togethercomputer/together-cookbook/blob/main/Finetuning/LoRA_Finetuning%26Inference.ipynb) | Perform LoRA fine-tuning and inference on Together AI. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/LoRA_Finetuning%26Inference.ipynb) |
-| [Preference Tuning - DPO](https://github.com/togethercomputer/together-cookbook/blob/main/Finetuning/DPO_Finetuning.ipynb) | Fine-tuning LLMs with preference data using DPO. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/DPO_Finetuning.ipynb) |
-| [Continual Fine-tuning](https://github.com/togethercomputer/together-cookbook/blob/main/Finetuning/Continual_Finetuning.ipynb) | Continuously fine-tuning model checkpoints on new data. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Continual_Finetuning.ipynb) |
-| [Long Context Finetuning For Repetition](https://github.com/togethercomputer/together-cookbook/blob/main/Finetuning/LongContext_Finetuning_RepetitionTask.ipynb) | Fine-tuning LLMs to repeat back words in long sequences. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/LongContext_Finetuning_RepetitionTask.ipynb) |
-| [Summarization Long Context Finetuning](https://github.com/togethercomputer/together-cookbook/blob/main/Finetuning/Summarization_LongContext_Finetuning.ipynb) | Long context fine-tuning to improve summarization capabilities. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Summarization_LongContext_Finetuning.ipynb) |
-| [Conversation Finetuning](https://github.com/togethercomputer/together-cookbook/blob/main/Finetuning/Multiturn_Conversation_Finetuning.ipynb) | Fine-tuning LLMs on multi-step conversations. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Multiturn_Conversation_Finetuning.ipynb) |
-| Retrieval-augmented generation  |  | |
-| [RAG_with_Reasoning_Models](https://github.com/togethercomputer/together-cookbook/blob/main/RAG/RAG_with_Reasoning_Models.ipynb) | RAG + source citations with DeepSeek R1. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG/RAG_with_Reasoning_Models.ipynb) |
-| [MultiModal_RAG_with_Nvidia_Deck](https://github.com/togethercomputer/together-cookbook/blob/main/RAG/MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb) | Multimodal RAG using Nvidia investor slides | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG/MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb) [![](https://uohmivykqgnnbiouffke.supabase.co/storage/v1/object/public/landingpage/youtubebadge.svg)](https://youtu.be/IluARWPYAUc?si=gG90hqpboQgNOAYG)|
-| [Open_Contextual_RAG](https://github.com/togethercomputer/together-cookbook/blob/main/RAG/Open_Contextual_RAG.ipynb) | An implementation of Contextual Retrieval using open models. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG/Open_Contextual_RAG.ipynb) |
-| [Text_RAG](https://github.com/togethercomputer/together-cookbook/blob/main/RAG/Text_RAG.ipynb) | Implement text-based Retrieval-Augmented Generation | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG/Text_RAG.ipynb) |
-| Search  |  |  |
-| [Multimodal Search and Conditional Image Generation](https://github.com/togethercomputer/together-cookbook/blob/main/Search/Multimodal_Search_and_Conditional_Image_Generation.ipynb) | Text-to-image and image-to-image search and condtional image generation. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Search/Multimodal_Search_and_Conditional_Image_Generation.ipynb) |
-| [Embedding_Visualization](https://github.com/togethercomputer/together-cookbook/blob/main/Search/Embedding_Visualization.ipynb) | Visualize vector embeddings | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Search/Embedding_Visualization.ipynb) |
-| [Search_with_Reranking](https://github.com/togethercomputer/together-cookbook/blob/main/Search/Search_with_Reranking.ipynb) | Improve search results with rerankers | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Search/Search_with_Reranking.ipynb) |
-| [Semantic_Search](https://github.com/togethercomputer/together-cookbook/blob/main/Search/Semantic_Search.ipynb) | Implement vector search with embedding models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Search/Semantic_Search.ipynb) |
-| Examples | | |
-| [Together_Code_Interpreter](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Together_Code_Interpreter.ipynb) | Execute code using Together Code Interpreter (TCI) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Together_Code_Interpreter.ipynb) |
-| [Thinking_Augmented_Generation](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Thinking_Augmented_Generation.ipynb) | Give R1 thinking tokens to small models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Thinking_Augmented_Generation.ipynb) |
-| [Flux LoRA Inference](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Flux_LoRA_Inference.ipynb) | Generate images with fine-tuned Flux LoRA's | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Flux_LoRA_Inference.ipynb) |
-| [Structured_Text_Extraction_from_Images](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Structured_Text_Extraction_from_Images.ipynb) | Extract structured text from images | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Structured_Text_Extraction_from_Images.ipynb) |
-| [Summarization Evaluation](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Summarization_Evaluation.ipynb) | Summarizing and evaluating outputs with LLMs. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Summarization_Evaluation.ipynb) |
-| [PDF_to_Podcast](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/PDF_to_Podcast.ipynb) | Generate a podcast from PDF content NotebookLM style! | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/PDF_to_Podcast.ipynb) |
-| [Knowledge_Graphs_with_Structured_Outputs](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Knowledge_Graphs_with_Structured_Outputs.ipynb) | Get LLMs to generate knowledge graphs | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Knowledge_Graphs_with_Structured_Outputs.ipynb) |
-| [Getting_started_with_Llama4](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Getting_started_with_Llama4.ipynb) | Get started with Llama 4 models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Getting_started_with_Llama4.ipynb) |
-| [Batch_Inference_Evals](https://github.com/togethercomputer/together-cookbook/blob/main/Examples/Batch_Inference_Evals.ipynb) | Batch inference and evaluation workflows | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Examples/Batch_Inference_Evals.ipynb) |
+| [Getting Started with Llama 4](Quickstarts/Getting_started_with_Llama4.ipynb) | Learn to use Llama 4 Maverick and Scout models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Quickstarts/Getting_started_with_Llama4.ipynb) |
+| [Thinking-Augmented Generation](Quickstarts/Thinking_Augmented_Generation.ipynb) | Give R1 thinking tokens to small models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Quickstarts/Thinking_Augmented_Generation.ipynb) |
+| [Knowledge Graphs](Quickstarts/Knowledge_Graphs_with_Structured_Outputs.ipynb) | Generate knowledge graphs with LLMs | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Quickstarts/Knowledge_Graphs_with_Structured_Outputs.ipynb) |
+
+---
+
+## 🔍 [RAG and Search](RAG_and_Search/)
+
+Build intelligent retrieval systems with semantic search and retrieval-augmented generation
+
+| Notebook | Description | Open |
+| -------- | ----------- | ---- |
+| [Text RAG](RAG_and_Search/Text_RAG.ipynb) | Basic RAG implementation with vector embeddings | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG_and_Search/Text_RAG.ipynb) |
+| [Semantic Search](RAG_and_Search/Semantic_Search.ipynb) | Implement vector search with embedding models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG_and_Search/Semantic_Search.ipynb) |
+| [Search with Reranking](RAG_and_Search/Search_with_Reranking.ipynb) | Improve search results with rerankers | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG_and_Search/Search_with_Reranking.ipynb) |
+| [Open Contextual RAG](RAG_and_Search/Open_Contextual_RAG.ipynb) | Contextual Retrieval using open models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG_and_Search/Open_Contextual_RAG.ipynb) |
+| [RAG with Reasoning Models](RAG_and_Search/RAG_with_Reasoning_Models.ipynb) | RAG + citations with DeepSeek R1 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG_and_Search/RAG_with_Reasoning_Models.ipynb) |
+| [Embedding Visualization](RAG_and_Search/Embedding_Visualization.ipynb) | Visualize vector embeddings | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/RAG_and_Search/Embedding_Visualization.ipynb) |
+| [Contextual RAG on Union](RAG_and_Search/contextual_rag_on_union/) | Full-stack RAG with FastAPI + Gradio | - |
+
+---
+
+## 🤖 [Agents](Agents/)
+
+Build autonomous AI workflows with fundamental agent patterns
+
+**Core Workflows:**
+| Workflow | Description | Open |
+| -------- | ----------- | ---- |
+| [Serial Chain Agent](Agents/Serial_Chain_Agent_Workflow.ipynb) | Chain multiple LLM calls sequentially | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Serial_Chain_Agent_Workflow.ipynb) |
+| [Conditional Router Agent](Agents/Conditional_Router_Agent_Workflow.ipynb) | Route tasks to specialized models | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Conditional_Router_Agent_Workflow.ipynb) |
+| [Parallel Agent Workflow](Agents/Parallel_Agent_Workflow.ipynb) | Run multiple LLMs in parallel | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Parallel_Agent_Workflow.ipynb) |
+| [Orchestrator Subtask Agent](Agents/Parallel_Subtask_Agent_Workflow.ipynb) | Break down tasks into parallel subtasks | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Parallel_Subtask_Agent_Workflow.ipynb) |
+| [Looping Agent Workflow](Agents/Looping_Agent_Workflow.ipynb) | Iteratively improve responses | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Looping_Agent_Workflow.ipynb) |
+
+**Specialized Agents:**
+| Agent | Description | Open |
+| ----- | ----------- | ---- |
+| [Together Open Deep Research](Agents/Together_Open_Deep_Research_CookBook.ipynb) | Multi-step web search agent | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/Together_Open_Deep_Research_CookBook.ipynb) |
+| [Data Science Agent](Agents/DataScienceAgent/Together_Open_DataScience_Agent.ipynb) | ReAct agent for data analysis | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Agents/DataScienceAgent/Together_Open_DataScience_Agent.ipynb) |
+
+---
+
+## 🎛️ [Fine-tuning](Finetuning/)
+
+Customize models for your specific needs
+
+| Notebook | Description | Open |
+| -------- | ----------- | ---- |
+| [End-to-end Fine-tuning Guide](Finetuning/Finetuning_Guide.ipynb) | Fine-tuning basics and best practices | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Finetuning_Guide.ipynb) [![YouTube](https://img.shields.io/badge/YouTube-Video-red)](https://youtu.be/AKO7YDcwhiQ?si=ZcOGdDeTRelwIqXd) |
+| [LoRA Inference and Fine-tuning](Finetuning/LoRA_Finetuning_and_Inference.ipynb) | Parameter-efficient fine-tuning | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/LoRA_Finetuning_and_Inference.ipynb) |
+| [Preference Tuning - DPO](Finetuning/DPO_Finetuning.ipynb) | Fine-tune with preference data using DPO | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/DPO_Finetuning.ipynb) |
+| [Continual Fine-tuning](Finetuning/Continual_Finetuning.ipynb) | Continuously fine-tune on new data | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Continual_Finetuning.ipynb) |
+| [Long Context Finetuning](Finetuning/LongContext_Finetuning_RepetitionTask.ipynb) | Fine-tune for long sequences | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/LongContext_Finetuning_RepetitionTask.ipynb) |
+| [Summarization Long Context](Finetuning/Summarization_LongContext_Finetuning.ipynb) | Improve summarization capabilities | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Summarization_LongContext_Finetuning.ipynb) |
+| [Conversation Finetuning](Finetuning/Multiturn_Conversation_Finetuning.ipynb) | Fine-tune on multi-step conversations | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Multiturn_Conversation_Finetuning.ipynb) |
+| [Flux LoRA Inference](Finetuning/Flux_LoRA_Inference.ipynb) | Generate images with fine-tuned Flux LoRAs | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Finetuning/Flux_LoRA_Inference.ipynb) |
+
+---
+
+## 📊 [Evals](Evals/)
+
+Evaluate and benchmark model performance
+
+| Notebook | Description | Open |
+| -------- | ----------- | ---- |
+| [Classification Evals](Evals/Classification_Evals.ipynb) | LLM-as-a-Judge for safety evaluation | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Classification_Evals.ipynb) |
+| [Compare Evals](Evals/Compare_Evals.ipynb) | Head-to-head model comparison | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Compare_Evals.ipynb) |
+| [Prompt Evals](Evals/Prompt_Evals.ipynb) | Prompt optimization through A/B testing | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Prompt_Evals.ipynb) |
+| [Batch Inference Evals](Evals/Batch_Inference_Evals.ipynb) | Batch inference and evaluation workflows | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Batch_Inference_Evals.ipynb) |
+| [Summarization Evaluation](Evals/Summarization_Evaluation.ipynb) | Evaluate summarization outputs | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Evals/Summarization_Evaluation.ipynb) |
+
+---
+
+## 🛠️ [Tools and Integrations](Tools_and_Integrations/)
+
+Extend capabilities with code execution, tool calling, and agent frameworks
+
+**Code Execution:**
+| Tool | Description | Open |
+| ---- | ----------- | ---- |
+| [Together Code Interpreter](Tools_and_Integrations/Code_Execution/Together_Code_Interpreter.ipynb) | Execute code using Together Code Interpreter | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Tools_and_Integrations/Code_Execution/Together_Code_Interpreter.ipynb) |
+| [OpenEnv Code Interpreter](Tools_and_Integrations/Code_Execution/OpenEnv_Code_Interpreter/) | Code Interpreter as OpenEnv environment | - |
+
+**Tool Calling:**
+| Tool | Description | Open |
+| ---- | ----------- | ---- |
+| [Tool Use with Toolhouse](Tools_and_Integrations/Tool_Calling/Tool_use_with_Toolhouse.ipynb) | Function calling with Toolhouse toolkit | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Tools_and_Integrations/Tool_Calling/Tool_use_with_Toolhouse.ipynb) |
+
+**Agent Frameworks:**
+| Framework | Notebooks |
+| --------- | --------- |
+| [LangGraph](Tools_and_Integrations/Agent_Frameworks/LangGraph/) | Agentic RAG, Planning Agent |
+| [DSPy](Tools_and_Integrations/Agent_Frameworks/DSPy/) | Agents with MIPRO optimization |
+| [Agno](Tools_and_Integrations/Agent_Frameworks/Agno/), [Composio](Tools_and_Integrations/Agent_Frameworks/Composio/), [Arcade](Tools_and_Integrations/Agent_Frameworks/Arcade/), [KlavisAI](Tools_and_Integrations/Agent_Frameworks/KlavisAI/), [PydanticAI](Tools_and_Integrations/Agent_Frameworks/PydanticAI/) | Various framework integrations |
+
+---
+
+## ☁️ [Together Instant Clusters](Together_Instant_Clusters/)
+
+Scale with distributed training on Kubernetes
+
+| Example | Description |
+| ------- | ----------- |
+| [GRPO BlackJack](Together_Instant_Clusters/GRPO_BlackJack/) | Train Qwen 1.5B with GRPO on Together Instant Clusters |
+
+---
+
+## 🎨 [Multimodal](Multimodal/)
+
+Work with images, audio, and cross-modal AI tasks
+
+| Notebook | Description | Open |
+| -------- | ----------- | ---- |
+| [MultiModal RAG with Nvidia Deck](Multimodal/MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb) | RAG over slides using ColPali | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Multimodal/MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb) [![YouTube](https://img.shields.io/badge/YouTube-Video-red)](https://youtu.be/IluARWPYAUc?si=gG90hqpboQgNOAYG) |
+| [Multimodal Search & Image Gen](Multimodal/Multimodal_Search_and_Conditional_Image_Generation.ipynb) | Text-to-image and image-to-image search | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Multimodal/Multimodal_Search_and_Conditional_Image_Generation.ipynb) |
+| [Structured Text from Images](Multimodal/Structured_Text_Extraction_from_Images.ipynb) | Extract structured data from images | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Multimodal/Structured_Text_Extraction_from_Images.ipynb) |
+| [PDF to Podcast](Multimodal/PDF_to_Podcast.ipynb) | Generate podcasts from PDFs | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/Multimodal/PDF_to_Podcast.ipynb) |
+
+---
 
 ## Explore Further
 
