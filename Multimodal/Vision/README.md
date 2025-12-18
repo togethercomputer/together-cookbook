@@ -36,12 +36,9 @@ T = min(2, max(H // 560, 1)) * min(2, max(W // 560, 1)) * 1601
 
 ```python
 import os
-import openai
+import together
 
-client = openai.OpenAI(
-    api_key=os.environ.get("TOGETHER_API_KEY"),
-    base_url="https://api.together.xyz/v1",
-)
+client = together.Together()
 
 response = client.chat.completions.create(
     model="Qwen/Qwen3-VL-32B-Instruct",
@@ -55,13 +52,6 @@ response = client.chat.completions.create(
 )
 print(response.choices[0].message.content)
 ```
-
-## ⚠️ Limitations
-
-The following capabilities require function calling with vision, which Together AI does not currently support:
-- Mobile device automation (`mobile_agent`)
-- Desktop GUI automation (`computer_use`)
-- Agent with zoom/search tools (`think_with_images`)
 
 ## 📋 Prerequisites
 
