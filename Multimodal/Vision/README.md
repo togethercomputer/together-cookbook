@@ -1,6 +1,6 @@
 # Vision with Qwen3-VL
 
-Explore Qwen3-VL's vision-language capabilities using Together AI's API. From OCR to 3D grounding, these notebooks cover a wide range of visual understanding tasks.
+Explore Qwen3-VL's vision-language capabilities using Together AI's API. From OCR to 3D grounding, these notebooks cover a wide range of visual understanding tasks. These notebooks are adapted from the original Qwen3 VL [repo](https://github.com/QwenLM/Qwen3-VL/tree/main).
 
 ## 📚 Notebooks
 
