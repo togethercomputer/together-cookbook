@@ -61,6 +61,6 @@ print(response.choices[0].message.content)
 
 ## 📖 Resources
 
-- [Together AI Documentation](https://docs.together.ai)
-- [Together AI Vision Guide](https://docs.together.ai/docs/vision)
+- [Together AI Documentation](https://docs.together.ai/intro)
+- [Together AI Vision Guide](https://docs.together.ai/docs/vision-overview)
 - [Qwen3-VL Model Card](https://huggingface.co/Qwen/Qwen3-VL-32B-Instruct)
