@@ -1,4 +1,4 @@
-<img src="images\together.gif" width="100%"/>
+<img src="images\TogetherAI_Logo_021026_Horizontal Lockup.svg" width="100%"/>
 
 <!-- Links -->
 <p align="center">
