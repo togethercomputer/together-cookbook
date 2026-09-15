@@ -1,0 +1,17 @@
+# CI manifest (DX-1042): entrypoints for this demo folder.
+# See .ci/run_examples.py for the schema.
+entrypoints:
+  - path: Contextual_RAG_on_Union.ipynb
+    kind: notebook
+    tier: excluded
+    reason: Requires a Union.ai remote deployment and MILVUS_TOKEN.
+  - path: fastapi_app.py
+    kind: app
+    tier: weekly
+    build:
+      - python -m py_compile fastapi_app.py
+  - path: gradio_app.py
+    kind: app
+    tier: weekly
+    build:
+      - python -m py_compile gradio_app.py

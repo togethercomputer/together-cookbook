@@ -1,0 +1,7 @@
+# CI manifest (DX-1042): entrypoints for this demo folder.
+# See .ci/run_examples.py for the schema.
+entrypoints:
+  - path: code_interpreter_demo.py
+    kind: script
+    tier: excluded
+    reason: Two-process demo; needs the OpenEnv server running in a second terminal.

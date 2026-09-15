@@ -1,0 +1,126 @@
+name: Execute Examples
+
+# Live-executes cookbook notebooks and demo entrypoints against the real API
+# to catch drift (removed endpoints, deprecated models, changed response
+# shapes). Modeled on mintlify-docs' weekly-code-samples-live.yml: same
+# secret names (TOGETHER_API_KEY, SLACK_BOT_TOKEN) and the same Slack
+# alerting pattern, hardened with a `jq -e '.ok'` check on the Slack API
+# response so a silently-failed post still surfaces in the run log.
+#
+# Tiers (see .ci/tiers.yaml and per-folder ci.yaml manifests):
+# - weekly: cheap, bounded notebooks. Mondays.
+# - monthly: expensive but bounded (image gen, eval jobs, big corpora). 1st.
+# - excluded: never executed (fine-tuning, GPU training, third-party keys).
+
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Tier to execute"
+        type: choice
+        default: weekly
+        options: [weekly, monthly, all]
+      only:
+        description: "Optional path filter (substring or glob)"
+        type: string
+        default: ""
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC -> weekly tier
+    - cron: "0 9 2 * *" # 2nd of the month 09:00 UTC -> monthly tier
+
+jobs:
+  execute-examples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+      # The harness also unsets this for every child process; keeping it out
+      # of the job env is belt and braces so runs always hit production.
+      TOGETHER_BASE_URL: ""
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install harness dependencies
+        # Notebook-specific dependencies are installed by the notebooks'
+        # own `!pip install` cells at execution time.
+        run: pip install pyyaml papermill ipykernel jupyter together
+
+      - name: Determine tier
+        id: tier
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tier="${{ github.event.inputs.tier }}"
+          elif [ "${{ github.event.schedule }}" = "0 9 2 * *" ]; then
+            tier="monthly"
+          else
+            tier="weekly"
+          fi
+          echo "tier=$tier" >> "$GITHUB_OUTPUT"
+
+      - name: Execute examples
+        id: run
+        run: |
+          set +e
+          args=(--tier "${{ steps.tier.outputs.tier }}")
+          if [ -n "${{ github.event.inputs.only }}" ]; then
+            args+=(--only "${{ github.event.inputs.only }}")
+          fi
+          out=$(python .ci/run_examples.py "${args[@]}" 2>&1)
+          code=$?
+          echo "$out"
+          {
+            echo "status=$code"
+            echo "output<<EOF"
+            echo "$out"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Notify Slack on failures
+        if: steps.run.outputs.status != '0'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SCRIPT_OUTPUT: ${{ steps.run.outputs.output }}
+        run: |
+          if [ -z "$SLACK_BOT_TOKEN" ]; then
+            echo "SLACK_BOT_TOKEN not configured, skipping"
+            exit 0
+          fi
+
+          # Aggregate summary line; per-unit [FAIL] details stay in run logs.
+          summary=$(echo "$SCRIPT_OUTPUT" | grep -E '^Tested:' | tail -1)
+          if [ -z "$summary" ]; then
+            summary="The run failed before producing a summary."
+          fi
+          fails=$(echo "$SCRIPT_OUTPUT" | grep -E '^\s*\[FAIL\]' | head -10)
+
+          message=$(jq -n \
+            --arg header ":warning: *Cookbook examples failed live execution (${{ steps.tier.outputs.tier }} tier)*" \
+            --arg body "$summary" \
+            --arg fails "$fails" \
+            --arg link "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>" \
+            '$header + "\n" + $body + (if $fails != "" then "\n```" + $fails + "```" else "" end) + "\n" + $link')
+
+          payload=$(jq -n --arg ch "C0AAK47PW3H" --argjson text "$message" '{channel: $ch, text: $text}')
+          resp=$(curl -s -X POST https://slack.com/api/chat.postMessage \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$payload")
+          # Slack returns HTTP 200 with {"ok": false} on errors, so check the
+          # response body, not just the HTTP status.
+          if ! echo "$resp" | jq -e '.ok' > /dev/null; then
+            echo "Slack notification failed: $resp"
+            exit 1
+          fi
+
+      - name: Fail job on execution failures
+        if: steps.run.outputs.status != '0'
+        run: |
+          echo "Live execution found failing examples. See the logs above."
+          exit 1

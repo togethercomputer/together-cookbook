@@ -1,0 +1,7 @@
+# CI manifest (DX-1042): entrypoints for this demo folder.
+# See .ci/run_examples.py for the schema.
+entrypoints:
+  - path: grpo_training.py
+    kind: script
+    tier: excluded
+    reason: GRPO training run; needs a Together Instant Cluster with an H100 node.

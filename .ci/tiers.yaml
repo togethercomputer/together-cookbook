@@ -1,0 +1,115 @@
+# Tier overrides for auto-discovered notebooks (DX-1042).
+#
+# Every notebook outside a ci.yaml manifest folder defaults to the `weekly`
+# execution tier. List a notebook here to move it to `monthly` (expensive but
+# bounded) or `excluded` (never executed by CI), with a one-line reason each.
+# Folders with a ci.yaml manifest declare tiers in the manifest instead.
+#
+# Classification rules of thumb:
+# - Fine-tuning, GPU-cluster training, and unbounded batch/agent loops: excluded.
+# - Needs a third-party API key CI doesn't have: excluded (until the secret is
+#   provisioned and DevRel wants it covered).
+# - Image/video/audio generation or large-corpus embedding runs: monthly.
+# - Bounded text/vision inference: weekly (the default; not listed here).
+
+overrides:
+  # --- Excluded: fine-tuning jobs (paid, multi-hour, unbounded queue time) ---
+  - path: Finetuning/Continual_Finetuning.ipynb
+    tier: excluded
+    reason: Launches paid fine-tuning jobs; multi-hour wall clock.
+  - path: Finetuning/DPO_Finetuning.ipynb
+    tier: excluded
+    reason: Launches a paid DPO fine-tuning job.
+  - path: Finetuning/Finetuning_Guide.ipynb
+    tier: excluded
+    reason: Launches a paid fine-tuning job.
+  - path: Finetuning/Function_Calling_Finetuning.ipynb
+    tier: excluded
+    reason: Launches a paid fine-tuning job.
+  - path: Finetuning/Reasoning_Finetuning.ipynb
+    tier: excluded
+    reason: Launches a paid reasoning fine-tuning job.
+  - path: Finetuning/Vision_Language_Finetuning.ipynb
+    tier: excluded
+    reason: Launches a paid vision-language fine-tuning job.
+  - path: LoRA_Finetuning&Inference.ipynb
+    tier: excluded
+    reason: Launches a paid low-rank adapter (LoRA) fine-tuning job.
+  - path: LongContext_Finetuning_RepetitionTask.ipynb
+    tier: excluded
+    reason: Long-context fine-tuning job; multi-hour and expensive.
+  - path: Multiturn_Conversation_Finetuning.ipynb
+    tier: excluded
+    reason: Launches a paid fine-tuning job.
+  - path: Summarization_LongContext_Finetuning.ipynb
+    tier: excluded
+    reason: Long-context fine-tuning job; multi-hour and expensive.
+
+  # --- Excluded: batch jobs at scale / unbounded wall clock ---
+  - path: Batch_Inference_Evals.ipynb
+    tier: excluded
+    reason: Submits batch API jobs at scale; completion time is queue-bound.
+
+  # --- Excluded: require third-party API keys CI does not have ---
+  - path: Agents/Arcade.dev/Agents_Arcade.ipynb
+    tier: excluded
+    reason: Requires ARCADE_API_KEY (third-party secret not in CI).
+  - path: Agents/Composio/Agents_Composio.ipynb
+    tier: excluded
+    reason: Requires COMPOSIO_API_KEY (third-party secret not in CI).
+  - path: Agents/KlavisAI/Agents_KlavisAI.ipynb
+    tier: excluded
+    reason: Requires KLAVIS_API_KEY (third-party secret not in CI).
+  - path: third_party_integrations/Tool_use_with_Toolhouse.ipynb
+    tier: excluded
+    reason: Requires TOOLHOUSE_API_KEY (third-party secret not in CI).
+  - path: Agents/Cross_Provider_Advisor_Workflow.ipynb
+    tier: excluded
+    reason: Requires ANTHROPIC_API_KEY in addition to Together.
+  - path: Agents/Together_Open_Deep_Research_CookBook.ipynb
+    tier: excluded
+    reason: Requires a Tavily search key; long multi-agent research run.
+  - path: Agents/DataScienceAgent/Together_Open_DataScience_Agent.ipynb
+    tier: excluded
+    reason: Requires E2B_API_KEY for the code sandbox (third-party secret).
+  - path: PDF_to_Podcast.ipynb
+    tier: excluded
+    reason: Requires a Cartesia TTS key; long audio-generation run.
+
+  # --- Monthly: expensive but bounded ---
+  - path: Flux_LoRA_Inference.ipynb
+    tier: monthly
+    reason: Image generation; billed per image.
+  - path: Multimodal_Search_and_Conditional_Image_Generation.ipynb
+    tier: monthly
+    reason: Image generation plus embedding a full image corpus.
+  - path: Multimodal/Vision/Video_Understanding.ipynb
+    tier: monthly
+    reason: Video-input inference; heavy token volume.
+  - path: Multimodal/Vision/Long_Document_Understanding.ipynb
+    tier: monthly
+    reason: Long-document vision inference; heavy token volume.
+  - path: MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb
+    tier: monthly
+    reason: Vision RAG over a full slide deck; many multimodal calls.
+  - path: Open_Contextual_RAG.ipynb
+    tier: monthly
+    reason: Generates per-chunk context for a whole corpus; many LLM calls.
+  - path: Summarization_Evaluation.ipynb
+    tier: monthly
+    reason: Long-context summarization over a corpus; high token spend.
+  - path: Evals/Classification_Evals.ipynb
+    tier: monthly
+    reason: Runs platform evaluation jobs; long poll times and per-run cost.
+  - path: Evals/Compare_Evals.ipynb
+    tier: monthly
+    reason: Runs platform evaluation jobs; long poll times and per-run cost.
+  - path: Evals/Prompt_Evals.ipynb
+    tier: monthly
+    reason: Runs platform evaluation jobs; long poll times and per-run cost.
+  - path: Evals/GEPA_Optimization.ipynb
+    tier: monthly
+    reason: Prompt-optimization loop; many LLM calls per run.
+  - path: Evals/Optimizing_LLM_Judges.ipynb
+    tier: monthly
+    reason: Repeated judge evaluation runs; high token spend.
