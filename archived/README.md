@@ -13,4 +13,7 @@ Notebooks in this folder are no longer maintained and are excluded from executio
 | [Embedding Visualization](Embedding_Visualization.ipynb) | 2026-09 | Same removed embeddings model; no serverless embedding models remain. |
 | [Flux LoRA Inference](Flux_LoRA_Inference.ipynb) | 2026-09 | `black-forest-labs/FLUX.1-krea-dev` (the only serverless image-LoRA serving) was deprecated 2026-05-27 with no replacement; `image_loras` is rejected by the current FLUX.2 models. |
 | [LoRA Inference and Fine-tuning](LoRA_Finetuning%26Inference.ipynb) | 2026-09 | Serverless LoRA inference (the `-adapter` serving path this notebook demonstrates) has been discontinued; fine-tuned adapters now serve on dedicated endpoints. |
+| [Together Code Interpreter](Together_Code_Interpreter.ipynb) | 2026-09 | Together Code Interpreter (TCI) has been removed from the platform; the `/v1/tci/execute` endpoint no longer exists. |
+| [Together Open Data Science Agent](DataScienceAgent/Together_Open_DataScience_Agent.ipynb) | 2026-09 | Built on Together Code Interpreter, which has been removed from the platform. |
+| [OpenEnv Code Interpreter](OpenEnv_Code_Interpreter/README.md) | 2026-09 | An OpenEnv environment wrapping Together Code Interpreter, which has been removed from the platform. |
 | [Getting Started with Llama 4](Getting_started_with_Llama4.ipynb) | 2026-09 | Llama 4-era getting-started content, superseded by current model quickstarts in the [docs Guides tab](https://docs.together.ai/docs/guides). |
