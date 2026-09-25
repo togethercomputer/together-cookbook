@@ -90,11 +90,13 @@ While the code examples are primarily written in Python/JS, the concepts can be 
 | [OpenEnv Code Interpreter](https://github.com/togethercomputer/together-cookbook/tree/main/OpenEnv_Code_Interpreter) | An OpenEnv environment that wraps the Together Code Interpreter. | — |
 | [OpenEnv GRPO BlackJack](https://github.com/togethercomputer/together-cookbook/tree/main/OpenEnv_GRPO_BlackJack) | Train Blackjack policies via GRPO using OpenEnv on Together. | — |
 
-## Conventions
+## Docs-backed demos
 
-**Docs-backed demos.** Every significant code demo in the [Together AI docs Guides tab](https://docs.together.ai/docs/guides) is backed by its own folder (or notebook) in this cookbook, cross-linked both ways: the folder README (or the notebook's intro cell) links the guide it backs, and the guide links the folder. The docs page is the source of truth for the explanation; the cookbook holds the full runnable code. Keep model IDs aligned with the docs page — the notebook never becomes the only copy of the explanation.
+Several code demos in the [Together AI documentation](https://docs.together.ai/docs/guides) are backed folders or notebooks in this repo. The docs page is the source of truth for the explanation, and the cookbook holds the full runnable code.
 
-**Archived notebooks.** Notebooks that depend on models no longer available on the platform, or that have been superseded, move to [`archived/`](https://github.com/togethercomputer/together-cookbook/tree/main/archived) instead of rotting in place. Archived notebooks are excluded from execution CI and from the table above; see [`archived/README.md`](https://github.com/togethercomputer/together-cookbook/blob/main/archived/README.md) for what was archived and why. Don't link to archived notebooks from the docs.
+## Archived notebooks
+
+Notebooks that depend on models no longer available on the platform, or that have been superseded, move to [`archived/`](https://github.com/togethercomputer/together-cookbook/tree/main/archived) instead of rotting in place. Archived notebooks are excluded from execution CI and from the table above. See [`archived/README.md`](https://github.com/togethercomputer/together-cookbook/blob/main/archived/README.md) for what was archived and why. Don't link to archived notebooks from the docs.
 
 ## Explore Further
 
