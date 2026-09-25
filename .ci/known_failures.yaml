@@ -1,0 +1,15 @@
+# Known-failure allowlist for cookbook CI (DX-1042).
+#
+# A unit listed here still runs, but a failure is reported as a warning
+# instead of failing the workflow (and so does not page anyone on Slack).
+# Use it for flaky upstreams, temporary model outages, or breakage that is
+# already tracked elsewhere. Every entry needs the notebook/script path, a
+# one-line reason, and the date it was added. Prune entries once the unit
+# passes again (the harness prints a reminder when that happens).
+
+known_failures: []
+# Example:
+# known_failures:
+#   - path: Text_RAG.ipynb
+#     reason: Upstream dataset host returning 503s; tracked in DX-NNNN.
+#     date: 2026-09-15
