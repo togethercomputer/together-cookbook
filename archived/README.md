@@ -1,0 +1,14 @@
+# Archived notebooks
+
+Notebooks in this folder are no longer maintained. They were archived because they depend on models that are no longer available on the Together platform, or because they have been superseded. They're kept for reference, but the code may not run as written.
+
+| Notebook | Archived | Why |
+| -------- | -------- | --- |
+| [Text RAG](Text_RAG.ipynb) | 2026-09 | Embeds with `intfloat/multilingual-e5-large-instruct`, removed from serverless 2026-09 with no replacement (serverless no longer offers embedding models). |
+| [Semantic Search](Semantic_Search.ipynb) | 2026-09 | Same removed embeddings model. |
+| [Search with Reranking](Search_with_Reranking.ipynb) | 2026-09 | Same removed embeddings model, and serverless offers no rerank models (rerank is dedicated-endpoints only). |
+| [Open Contextual RAG](Open_Contextual_RAG.ipynb) | 2026-09 | Same removed embeddings model. |
+| [Contextual RAG on Union](contextual_rag_on_union/Contextual_RAG_on_Union.ipynb) | 2026-09 | Same removed embeddings model (Union.ai deployment variant of Open Contextual RAG). |
+| [RAG with Reasoning Models](RAG_with_Reasoning_Models.ipynb) | 2026-09 | Same removed embeddings model, plus DeepSeek-R1, which is no longer on serverless. |
+| [Embedding Visualization](Embedding_Visualization.ipynb) | 2026-09 | Same removed embeddings model. |
+| [Getting Started with Llama 4](Getting_started_with_Llama4.ipynb) | 2026-09 | Llama 4-era getting-started content, superseded by current model quickstarts in the [docs Guides tab](https://docs.together.ai/docs/guides). |
