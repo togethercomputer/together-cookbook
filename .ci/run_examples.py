@@ -71,7 +71,10 @@ SKIP_DIRS = {
     "venv",
 }
 
-DEFAULT_TIMEOUT = 1800  # seconds per unit
+# Units run sequentially, so the default keeps the worst case (every unit
+# hanging to timeout) inside the workflow's timeout-minutes. Slow-but-bounded
+# units carry an explicit `timeout` in tiers.yaml or their manifest.
+DEFAULT_TIMEOUT = 600  # seconds per unit
 
 
 @dataclasses.dataclass

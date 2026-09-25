@@ -11,6 +11,12 @@
 #   provisioned and DevRel wants it covered).
 # - Image/video/audio generation or large-corpus embedding runs: monthly.
 # - Bounded text/vision inference: weekly (the default; not listed here).
+#
+# Timeouts: the default is 600s per unit (.ci/run_examples.py). Units run
+# sequentially, so per-unit timeouts are budgeted against the workflow's
+# timeout-minutes and GitHub's 360-minute job cap: 28 weekly x 600s and
+# 12 monthly x <=1800s both fit even if every unit hangs to timeout. Keep
+# that arithmetic in mind before raising a timeout or adding many units.
 
 overrides:
   # --- Excluded: fine-tuning jobs (paid, multi-hour, unbounded queue time) ---
@@ -83,34 +89,45 @@ overrides:
   # --- Monthly: expensive but bounded ---
   - path: Flux_LoRA_Inference.ipynb
     tier: monthly
+    timeout: 1500
     reason: Image generation; billed per image.
   - path: Multimodal_Search_and_Conditional_Image_Generation.ipynb
     tier: monthly
+    timeout: 1500
     reason: Image generation plus embedding a full image corpus.
   - path: Multimodal/Vision/Video_Understanding.ipynb
     tier: monthly
+    timeout: 1500
     reason: Video-input inference; heavy token volume.
   - path: Multimodal/Vision/Long_Document_Understanding.ipynb
     tier: monthly
+    timeout: 1500
     reason: Long-document vision inference; heavy token volume.
   - path: MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb
     tier: monthly
+    timeout: 1500
     reason: Vision RAG over a full slide deck; many multimodal calls.
   - path: Summarization_Evaluation.ipynb
     tier: monthly
+    timeout: 1500
     reason: Long-context summarization over a corpus; high token spend.
   - path: Evals/Classification_Evals.ipynb
     tier: monthly
+    timeout: 1500
     reason: Runs platform evaluation jobs; long poll times and per-run cost.
   - path: Evals/Compare_Evals.ipynb
     tier: monthly
+    timeout: 1500
     reason: Runs platform evaluation jobs; long poll times and per-run cost.
   - path: Evals/Prompt_Evals.ipynb
     tier: monthly
+    timeout: 1500
     reason: Runs platform evaluation jobs; long poll times and per-run cost.
   - path: Evals/GEPA_Optimization.ipynb
     tier: monthly
+    timeout: 1500
     reason: Prompt-optimization loop; many LLM calls per run.
   - path: Evals/Optimizing_LLM_Judges.ipynb
     tier: monthly
+    timeout: 1500
     reason: Repeated judge evaluation runs; high token spend.
