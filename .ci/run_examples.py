@@ -59,6 +59,7 @@ SKIP_DIRS = {
     ".git",
     ".ci",
     ".github",
+    "archived",  # superseded notebooks (see archived/README.md); never executed
     ".ipynb_checkpoints",
     "node_modules",
     "images",

@@ -75,6 +75,10 @@ overrides:
   - path: PDF_to_Podcast.ipynb
     tier: excluded
     reason: Requires a Cartesia TTS key; long audio-generation run.
+  - path: contextual_rag_on_union/Contextual_RAG_on_Union.ipynb
+    tier: excluded
+    reason: Requires a Union.ai remote deployment and MILVUS_TOKEN. Folder is
+      archived by PR #87; drop this entry once the archive lands.
 
   # --- Monthly: expensive but bounded ---
   - path: Flux_LoRA_Inference.ipynb
@@ -92,9 +96,6 @@ overrides:
   - path: MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb
     tier: monthly
     reason: Vision RAG over a full slide deck; many multimodal calls.
-  - path: Open_Contextual_RAG.ipynb
-    tier: monthly
-    reason: Generates per-chunk context for a whole corpus; many LLM calls.
   - path: Summarization_Evaluation.ipynb
     tier: monthly
     reason: Long-context summarization over a corpus; high token spend.
