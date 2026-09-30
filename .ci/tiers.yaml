@@ -22,103 +22,103 @@
 
 overrides:
   # --- Excluded: fine-tuning jobs (paid, multi-hour, unbounded queue time) ---
-  - path: Finetuning/Continual_Finetuning.ipynb
+  - path: fine-tuning/Continual_Finetuning.ipynb
     tier: excluded
     reason: Launches paid fine-tuning jobs; multi-hour wall clock.
-  - path: Finetuning/DPO_Finetuning.ipynb
+  - path: fine-tuning/DPO_Finetuning.ipynb
     tier: excluded
     reason: Launches a paid DPO fine-tuning job.
-  - path: Finetuning/Finetuning_Guide.ipynb
+  - path: fine-tuning/Finetuning_Guide.ipynb
     tier: excluded
     reason: Launches a paid fine-tuning job.
-  - path: Finetuning/Function_Calling_Finetuning.ipynb
+  - path: fine-tuning/Function_Calling_Finetuning.ipynb
     tier: excluded
     reason: Launches a paid fine-tuning job.
-  - path: Finetuning/Reasoning_Finetuning.ipynb
+  - path: fine-tuning/Reasoning_Finetuning.ipynb
     tier: excluded
     reason: Launches a paid reasoning fine-tuning job.
-  - path: Finetuning/Vision_Language_Finetuning.ipynb
+  - path: fine-tuning/Vision_Language_Finetuning.ipynb
     tier: excluded
     reason: Launches a paid vision-language fine-tuning job.
-  - path: LongContext_Finetuning_RepetitionTask.ipynb
+  - path: fine-tuning/LongContext_Finetuning_RepetitionTask.ipynb
     tier: excluded
     reason: Long-context fine-tuning job; multi-hour and expensive.
-  - path: Multiturn_Conversation_Finetuning.ipynb
+  - path: fine-tuning/Multiturn_Conversation_Finetuning.ipynb
     tier: excluded
     reason: Launches a paid fine-tuning job.
-  - path: Summarization_LongContext_Finetuning.ipynb
+  - path: fine-tuning/Summarization_LongContext_Finetuning.ipynb
     tier: excluded
     reason: Long-context fine-tuning job; multi-hour and expensive.
 
   # --- Excluded: batch jobs at scale / unbounded wall clock ---
-  - path: Batch_Inference_Evals.ipynb
+  - path: inference/batch/Batch_Inference_Evals.ipynb
     tier: excluded
     reason: Submits batch API jobs at scale; completion time is queue-bound.
 
   # --- Excluded: require third-party API keys CI does not have ---
-  - path: Agents/Arcade.dev/Agents_Arcade.ipynb
+  - path: agents/Arcade.dev/Agents_Arcade.ipynb
     tier: excluded
     reason: Requires ARCADE_API_KEY (third-party secret not in CI).
-  - path: Agents/Composio/Agents_Composio.ipynb
+  - path: agents/Composio/Agents_Composio.ipynb
     tier: excluded
     reason: Requires COMPOSIO_API_KEY (third-party secret not in CI).
-  - path: Agents/KlavisAI/Agents_KlavisAI.ipynb
+  - path: agents/KlavisAI/Agents_KlavisAI.ipynb
     tier: excluded
     reason: Requires KLAVIS_API_KEY (third-party secret not in CI).
-  - path: third_party_integrations/Tool_use_with_Toolhouse.ipynb
+  - path: agents/Tool_use_with_Toolhouse.ipynb
     tier: excluded
     reason: Requires TOOLHOUSE_API_KEY (third-party secret not in CI).
-  - path: Agents/Cross_Provider_Advisor_Workflow.ipynb
+  - path: agents/Cross_Provider_Advisor_Workflow.ipynb
     tier: excluded
     reason: Requires ANTHROPIC_API_KEY in addition to Together.
-  - path: Agents/Together_Open_Deep_Research_CookBook.ipynb
+  - path: agents/Together_Open_Deep_Research_CookBook.ipynb
     tier: excluded
     reason: Requires a Tavily search key; long multi-agent research run.
-  - path: Agents/LangGraph/LangGraph_Planning_Agent.ipynb
+  - path: agents/LangGraph/LangGraph_Planning_Agent.ipynb
     tier: excluded
     reason: Requires TAVILY_API_KEY (third-party secret not in CI).
-  - path: PDF_to_Podcast.ipynb
+  - path: apps/PDF_to_Podcast.ipynb
     tier: excluded
     reason: Requires a Cartesia TTS key; long audio-generation run.
 
   # --- Monthly: expensive but bounded ---
-  - path: Multimodal_Search_and_Conditional_Image_Generation.ipynb
+  - path: inference/image-generation/Multimodal_Search_and_Conditional_Image_Generation.ipynb
     tier: monthly
     timeout: 1500
     reason: Image generation plus embedding a full image corpus.
-  - path: Multimodal/Vision/Video_Understanding.ipynb
+  - path: inference/vision/Video_Understanding.ipynb
     tier: monthly
     timeout: 1500
     reason: Video-input inference; heavy token volume.
-  - path: Multimodal/Vision/Long_Document_Understanding.ipynb
+  - path: inference/vision/Long_Document_Understanding.ipynb
     tier: monthly
     timeout: 1500
     reason: Long-document vision inference; heavy token volume.
-  - path: MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb
+  - path: inference/vision/MultiModal_RAG_with_Nvidia_Investor_Slide_Deck.ipynb
     tier: monthly
     timeout: 1500
     reason: Vision RAG over a full slide deck; many multimodal calls.
-  - path: Summarization_Evaluation.ipynb
+  - path: inference/chat/Summarization_Evaluation.ipynb
     tier: monthly
     timeout: 1500
     reason: Long-context summarization over a corpus; high token spend.
-  - path: Evals/Classification_Evals.ipynb
+  - path: evaluations/Classification_Evals.ipynb
     tier: monthly
     timeout: 1500
     reason: Runs platform evaluation jobs; long poll times and per-run cost.
-  - path: Evals/Compare_Evals.ipynb
+  - path: evaluations/Compare_Evals.ipynb
     tier: monthly
     timeout: 1500
     reason: Runs platform evaluation jobs; long poll times and per-run cost.
-  - path: Evals/Prompt_Evals.ipynb
+  - path: evaluations/Prompt_Evals.ipynb
     tier: monthly
     timeout: 1500
     reason: Runs platform evaluation jobs; long poll times and per-run cost.
-  - path: Evals/GEPA_Optimization.ipynb
+  - path: evaluations/GEPA_Optimization.ipynb
     tier: monthly
     timeout: 1500
     reason: Prompt-optimization loop; many LLM calls per run.
-  - path: Evals/Optimizing_LLM_Judges.ipynb
+  - path: evaluations/Optimizing_LLM_Judges.ipynb
     tier: monthly
     timeout: 1500
     reason: Repeated judge evaluation runs; high token spend.
