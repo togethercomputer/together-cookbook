@@ -14,9 +14,11 @@
 #
 # Timeouts: the default is 600s per unit (.ci/run_examples.py). Units run
 # sequentially, so per-unit timeouts are budgeted against the workflow's
-# timeout-minutes and GitHub's 360-minute job cap: 28 weekly x 600s and
-# 12 monthly x <=1800s both fit even if every unit hangs to timeout. Keep
-# that arithmetic in mind before raising a timeout or adding many units.
+# timeout-minutes (350) and GitHub's 360-minute job cap. At the time of
+# writing, 19 weekly x 600s (190 min) and 11 monthly x <=1800s (280 min)
+# both fit even if every unit hangs to timeout. Re-check that arithmetic
+# with `python .ci/run_examples.py --list --tier <tier>` before raising a
+# timeout or adding many units.
 
 overrides:
   # --- Excluded: fine-tuning jobs (paid, multi-hour, unbounded queue time) ---
@@ -72,6 +74,9 @@ overrides:
   - path: Agents/Together_Open_Deep_Research_CookBook.ipynb
     tier: excluded
     reason: Requires a Tavily search key; long multi-agent research run.
+  - path: Agents/LangGraph/LangGraph_Planning_Agent.ipynb
+    tier: excluded
+    reason: Requires TAVILY_API_KEY (third-party secret not in CI).
   - path: PDF_to_Podcast.ipynb
     tier: excluded
     reason: Requires a Cartesia TTS key; long audio-generation run.
