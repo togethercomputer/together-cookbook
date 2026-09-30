@@ -7,9 +7,21 @@
 # one-line reason, and the date it was added. Prune entries once the unit
 # passes again (the harness prints a reminder when that happens).
 
-known_failures: []
-# Example:
-# known_failures:
-#   - path: Text_RAG.ipynb
-#     reason: Upstream dataset host returning 503s; tracked in DX-NNNN.
-#     date: 2026-09-15
+known_failures:
+  # Residual weekly-tier failures found by live-running the tier on 2026-09-30,
+  # after the DX-1050 remediation merged. All five are tracked in DX-1092.
+  - path: Agents/Agno/Agents_Agno.ipynb
+    reason: Inline comment on the pip line swallows openai/lancedb installs; tracked in DX-1092.
+    date: 2026-09-30
+  - path: Agents/DSPy/DSPy_Agents.ipynb
+    reason: Imports `datasets` without installing it; tracked in DX-1092.
+    date: 2026-09-30
+  - path: Agents/Serial_Chain_Agent_Workflow.ipynb
+    reason: Kimi-K3 PDF summary exceeds the SDK default 60s read timeout; tracked in DX-1092.
+    date: 2026-09-30
+  - path: Multimodal/Vision/3D_Grounding.ipynb
+    reason: GLM-5.3-Flash request times out at the SDK default 60s; tracked in DX-1092.
+    date: 2026-09-30
+  - path: Knowledge_Graphs_with_Structured_Outputs.ipynb
+    reason: GLM-5.3-Flash intermittently returns JSON without `nodes`; tracked in DX-1092.
+    date: 2026-09-30
