@@ -1,0 +1,11 @@
+# CI manifest (DX-1042): entrypoints for this demo folder.
+# See .ci/run_examples.py for the schema.
+entrypoints:
+  - path: content_writer.py
+    kind: script
+    tier: monthly
+    reason: Single bounded deep-agent run on a 550B model; expensive but finite.
+    timeout: 1800
+    command: >-
+      python -m pip install -q deepagents langchain langchain-together together &&
+      python content_writer.py "Write a two-paragraph note on what the Ralph agent pattern is."

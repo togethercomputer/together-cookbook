@@ -1,0 +1,7 @@
+# CI manifest (DX-1042): entrypoints for this demo folder.
+# See .ci/run_examples.py for the schema.
+entrypoints:
+  - path: ralph_loop.py
+    kind: script
+    tier: excluded
+    reason: Autonomous long-running agent loop; unbounded runtime and spend.
