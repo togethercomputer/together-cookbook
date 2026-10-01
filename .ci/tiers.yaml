@@ -15,7 +15,7 @@
 # Timeouts: the default is 600s per unit (.ci/run_examples.py). Units run
 # sequentially, so per-unit timeouts are budgeted against the workflow's
 # timeout-minutes (350) and GitHub's 360-minute job cap. At the time of
-# writing, 19 weekly x 600s (190 min) and 11 monthly x <=1800s (280 min)
+# writing, 20 weekly x 600s (200 min) and 11 monthly x <=1800s (280 min)
 # both fit even if every unit hangs to timeout. Re-check that arithmetic
 # with `python .ci/run_examples.py --list --tier <tier>` before raising a
 # timeout or adding many units.
