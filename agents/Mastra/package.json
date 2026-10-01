@@ -1,0 +1,22 @@
+{
+  "name": "together-mastra-quickstart",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Runnable companion to the Together AI docs Mastra quickstart: a Mastra agent with a weather tool, served by a Together AI serverless model.",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@mastra/core": "^1.73.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.0"
+  }
+}
