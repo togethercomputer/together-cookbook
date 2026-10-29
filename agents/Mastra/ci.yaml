@@ -1,0 +1,12 @@
+# CI manifest (DX-1042): entrypoints for this demo folder.
+# See .ci/run_examples.py for the schema.
+entrypoints:
+  - path: src/index.ts
+    kind: script
+    tier: weekly
+    reason: One bounded agent call on a serverless model plus a keyless Open-Meteo lookup.
+    timeout: 600
+    command: >-
+      npm ci --no-audit --no-fund &&
+      npm run typecheck &&
+      npm start

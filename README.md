@@ -62,6 +62,7 @@ While the code examples are primarily written in Python/JS, the concepts can be 
 | [Klavis AI Agents](https://github.com/togethercomputer/together-cookbook/blob/main/agents/KlavisAI/Agents_KlavisAI.ipynb) | Use Klavis AI to give agents access to MCP-based tools. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/agents/KlavisAI/Agents_KlavisAI.ipynb) |
 | [Agentic RAG with LangGraph](https://github.com/togethercomputer/together-cookbook/blob/main/agents/LangGraph/Agentic_RAG_LangGraph.ipynb) | Build an agentic RAG pipeline with LangGraph. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/agents/LangGraph/Agentic_RAG_LangGraph.ipynb) |
 | [LangGraph Planning Agent](https://github.com/togethercomputer/together-cookbook/blob/main/agents/LangGraph/LangGraph_Planning_Agent.ipynb) | Build a plan-and-execute agent with LangGraph. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/agents/LangGraph/LangGraph_Planning_Agent.ipynb) |
+| [Mastra Weather Agent](https://github.com/togethercomputer/together-cookbook/tree/main/agents/Mastra) | Point a Mastra agent at a Together AI model through the model router (TypeScript). | — |
 | [PydanticAI Agents](https://github.com/togethercomputer/together-cookbook/blob/main/agents/PydanticAI/PydanticAI_Agents.ipynb) | Build type-safe agents with PydanticAI and Together. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/agents/PydanticAI/PydanticAI_Agents.ipynb) |
 | [Tool Use with Toolhouse](https://github.com/togethercomputer/together-cookbook/blob/main/agents/Tool_use_with_Toolhouse.ipynb) | Use Toolhouse tools with Together's function-calling models. | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/togethercomputer/together-cookbook/blob/main/agents/Tool_use_with_Toolhouse.ipynb) |
 | **Apps** | | |
@@ -92,7 +93,7 @@ While the code examples are primarily written in Python/JS, the concepts can be 
 Folders mirror the product areas in the [Together AI docs](https://docs.together.ai/docs/introduction). New notebooks go in the folder for the product they demonstrate:
 
 - `inference/`: examples that call the inference APIs, grouped by capability (`chat/`, `vision/`, `image-generation/`, `structured-outputs/`, `batch/`). These run on serverless models or on [dedicated model inference](https://docs.together.ai/docs/dedicated-endpoints/overview) by swapping the `model` parameter.
-- `agents/`: agent workflow patterns and framework integrations (LangGraph, DSPy, PydanticAI, Agno, tool providers such as Arcade, Composio, Klavis, and Toolhouse).
+- `agents/`: agent workflow patterns and framework integrations (LangGraph, DSPy, PydanticAI, Agno, Mastra, tool providers such as Arcade, Composio, Klavis, and Toolhouse).
 - `apps/`: end-to-end demo apps that back the [Build apps guides](https://docs.together.ai/docs/guides).
 - `fine-tuning/`: fine-tuning jobs, from the end-to-end guide to DPO, continual, long-context, and vision-language runs.
 - `evaluations/`: the Evaluations API (classification, comparison, prompt, and judge-tuning evals).
@@ -105,7 +106,31 @@ Folders with runnable scripts rather than notebooks carry a `ci.yaml` manifest f
 
 ## Docs-backed demos
 
-Several code demos in the [Together AI documentation](https://docs.together.ai/docs/guides) are backed folders or notebooks in this repo. The docs page is the source of truth for the explanation, and the cookbook holds the full runnable code.
+Every significant code demo in the [Together AI docs guides](https://docs.together.ai/docs/guides) is backed by a folder or notebook in this repo. The split is fixed:
+
+- **The docs page teaches and is the source of truth.** The explanation lives on the docs page. The cookbook never becomes the only copy of it.
+- **The cookbook runs.** The folder or notebook holds the complete runnable code, covered by execution CI.
+- **Linked both ways.** The notebook's first cell (or the folder's README) links the guide, and the guide links the notebook or folder.
+- **Same model IDs on both sides.** When the guide changes models, change the cookbook copy in the same wave, and the other way round.
+
+Full-stack demo apps that live in their own app repo count as backed for now. They move into `apps/` one folder per app over time.
+
+Current pairs:
+
+| Docs page | Cookbook |
+| --- | --- |
+| [Sequential workflow](https://docs.together.ai/docs/sequential-agent-workflow) | `agents/Serial_Chain_Agent_Workflow.ipynb` |
+| [Parallel workflow](https://docs.together.ai/docs/parallel-workflows) | `agents/Parallel_Agent_Workflow.ipynb`, `agents/Parallel_Subtask_Agent_Workflow.ipynb` |
+| [Conditional workflow](https://docs.together.ai/docs/conditional-workflows) | `agents/Conditional_Router_Agent_Workflow.ipynb` |
+| [Iterative workflow](https://docs.together.ai/docs/iterative-workflow) | `agents/Looping_Agent_Workflow.ipynb` |
+| [LangGraph](https://docs.together.ai/docs/langgraph) | `agents/LangGraph/` |
+| [DSPy](https://docs.together.ai/docs/dspy) | `agents/DSPy/DSPy_Agents.ipynb` |
+| [PydanticAI](https://docs.together.ai/docs/pydanticai) | `agents/PydanticAI/PydanticAI_Agents.ipynb` |
+| [Agno](https://docs.together.ai/docs/agno) | `agents/Agno/Agents_Agno.ipynb` |
+| [Composio](https://docs.together.ai/docs/composio) | `agents/Composio/Agents_Composio.ipynb` |
+| [Mastra quickstart](https://docs.together.ai/docs/using-together-with-mastra) | `agents/Mastra/` |
+| [PDF to podcast](https://docs.together.ai/docs/open-notebooklm-pdf-to-podcast) | `apps/PDF_to_Podcast.ipynb` |
+| [Grafana dashboards for dedicated endpoints](https://docs.together.ai/docs/dedicated-endpoints/grafana) | `dedicated-endpoints/Grafana_Dedicated_Endpoints/` |
 
 ## Archived notebooks
 
