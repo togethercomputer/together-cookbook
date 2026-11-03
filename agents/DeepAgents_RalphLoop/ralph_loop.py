@@ -5,7 +5,7 @@
 #     "langchain-together",
 # ]
 # ///
-"""Ralph loop on Together AI's Nemotron 3 Ultra.
+"""Ralph loop on Together AI's NVIDIA Nemotron 3.5 Super.
 
 The "Ralph" pattern (named after Geoff Huntley's `while :; do cat PROMPT.md |
 agent; done`) runs an agent on the SAME task over and over, with a FRESH
@@ -16,7 +16,7 @@ accumulates, the loop can run indefinitely without summarization or
 compaction.
 
 This version uses Deep Agents (`create_deep_agent`) directly with
-`nvidia/nemotron-3-ultra-550b-a55b` served on Together AI. Files persist in a
+`nvidia/NVIDIA-Nemotron-3.5-Super-VL` served on Together AI. Files persist in a
 local work directory; the agent is jailed to it via
 `FilesystemBackend(virtual_mode=True)`.
 
@@ -36,7 +36,7 @@ from pathlib import Path
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 
-DEFAULT_MODEL = "together:nvidia/nemotron-3-ultra-550b-a55b"
+DEFAULT_MODEL = "together:nvidia/NVIDIA-Nemotron-3.5-Super-VL"
 
 SYSTEM_PROMPT = """\
 You are an autonomous builder agent running inside a "Ralph loop": you are \
