@@ -49,6 +49,9 @@ overrides:
   - path: fine-tuning/Summarization_LongContext_Finetuning.ipynb
     tier: excluded
     reason: Long-context fine-tuning job; multi-hour and expensive.
+  - path: evaluations/Optimizing_LLM_Judges.ipynb
+    tier: excluded
+    reason: Launches two paid DPO fine-tuning jobs after the baseline evals.
 
   # --- Excluded: batch jobs at scale / unbounded wall clock ---
   - path: inference/batch/Batch_Inference_Evals.ipynb
@@ -118,7 +121,3 @@ overrides:
     tier: monthly
     timeout: 1500
     reason: Prompt-optimization loop; many LLM calls per run.
-  - path: evaluations/Optimizing_LLM_Judges.ipynb
-    tier: monthly
-    timeout: 1500
-    reason: Repeated judge evaluation runs; high token spend.

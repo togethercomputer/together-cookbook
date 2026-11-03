@@ -1,7 +1,7 @@
-# Content Writer with Nemotron 3 Ultra
+# Content Writer with NVIDIA Nemotron 3.5 Super
 
 A configurable content-writing agent (blog posts, LinkedIn posts, Twitter/X threads) built with
-[NVIDIA Nemotron 3 Ultra](https://api.together.ai/models/nvidia/nemotron-3-ultra-550b-a55b),
+[NVIDIA Nemotron 3.5 Super](https://api.together.ai/models/nvidia/NVIDIA-Nemotron-3.5-Super-VL),
 running on Together AI via [LangChain Deep Agents](https://github.com/langchain-ai/deepagents).
 
 This cookbook demonstrates how to separate reusable writing expertise from application logic
@@ -16,7 +16,7 @@ In this cookbook you'll learn how to:
 
 - Build a configurable content-writing agent with LangChain Deep Agents
 - Customize agent behavior through memory and skills files
-- Run NVIDIA Nemotron 3 Ultra on Together AI
+- Run NVIDIA Nemotron 3.5 Super on Together AI
 - Separate reusable expertise from application logic
 
 ## How it's configured (files, not code)
@@ -40,7 +40,7 @@ The agent's behavior lives in plain files, loaded by the Deep Agents harness:
 
 ```python
 create_deep_agent(
-    model="together:nvidia/nemotron-3-ultra-550b-a55b",
+    model="together:nvidia/NVIDIA-Nemotron-3.5-Super-VL",
     memory=["/AGENTS.md"],
     skills=["/skills/"],
     backend=FilesystemBackend(root_dir=str(HERE), virtual_mode=True),
