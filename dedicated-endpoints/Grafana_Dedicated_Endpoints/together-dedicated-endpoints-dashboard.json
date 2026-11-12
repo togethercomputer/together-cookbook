@@ -63,8 +63,8 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(edge_inference_requests_total, endpoint_id)",
-        "query": "label_values(edge_inference_requests_total, endpoint_id)",
+        "definition": "label_values(edge_inference_requests_rate5m, endpoint_id)",
+        "query": "label_values(edge_inference_requests_rate5m, endpoint_id)",
         "refresh": 1,
         "sort": 1,
         "multi": true,
@@ -85,8 +85,8 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(edge_inference_requests_total{endpoint_id=~\"$endpoint\"}, deployment_id)",
-        "query": "label_values(edge_inference_requests_total{endpoint_id=~\"$endpoint\"}, deployment_id)",
+        "definition": "label_values(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\"}, deployment_id)",
+        "query": "label_values(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\"}, deployment_id)",
         "refresh": 2,
         "sort": 1,
         "multi": true,
@@ -123,7 +123,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**Together Dedicated Endpoint Metrics \u2014 example dashboard.** Requires a Prometheus/Alloy that scrapes `https://o11y-de2-metrics.cloud.together.ai/organizations/{org_id}/metrics` (Bearer = your Together API key). Use the **Endpoint** / **Deployment** variables to filter. Latency panels are computed from histogram buckets client-side. Note: `edge_*` latencies are in **milliseconds**; `router_*` / `worker_*` latencies are in **seconds**."
+        "content": "**Together Dedicated Endpoint Metrics \u2014 example dashboard.** Requires a Prometheus/Alloy that scrapes `https://o11y-de2-metrics.cloud.together.ai/organizations/{org_id}/metrics` (Bearer = your Together API key). Use the **Endpoint** / **Deployment** variables to filter. Request, token and latency metrics are per-second rates over the last 5 minutes (`*_rate5m`), so panels use them directly, without `rate()`; latency percentiles come from their `_rate5m_bucket` series. `worker_inference_request_total` is still a counter. Note: `edge_*` latencies are in **milliseconds**; `router_*` / `worker_*` latencies are in **seconds**."
       }
     },
     {
@@ -191,7 +191,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "sum by (status_code) (rate(edge_inference_requests_total{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval]))",
+          "expr": "sum by (status_code) (edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
           "legendFormat": "{{status_code}}"
         }
       ]
@@ -253,7 +253,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "(sum(rate(edge_inference_requests_total{status_code=~\"5..\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])) or vector(0)) / sum(rate(edge_inference_requests_total{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval]))",
+          "expr": "(sum(edge_inference_requests_rate5m{status_code=~\"5..\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}) or vector(0)) / sum(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
           "legendFormat": "5xx ratio"
         }
       ]
@@ -368,7 +368,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(edge_inference_request_duration_ms_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (edge_inference_request_duration_ms_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -379,7 +379,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(edge_inference_request_duration_ms_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (edge_inference_request_duration_ms_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -390,7 +390,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(edge_inference_request_duration_ms_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (edge_inference_request_duration_ms_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -439,7 +439,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(edge_inference_ttft_ms_bucket{is_streaming=\"true\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (edge_inference_ttft_ms_rate5m_bucket{is_streaming=\"true\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -450,7 +450,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(edge_inference_ttft_ms_bucket{is_streaming=\"true\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (edge_inference_ttft_ms_rate5m_bucket{is_streaming=\"true\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -461,7 +461,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(edge_inference_ttft_ms_bucket{is_streaming=\"true\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (edge_inference_ttft_ms_rate5m_bucket{is_streaming=\"true\",endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -523,7 +523,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(router_inference_request_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (router_inference_request_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -534,7 +534,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(router_inference_request_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (router_inference_request_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -545,7 +545,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(router_inference_request_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (router_inference_request_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -594,7 +594,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(router_pre_worker_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (router_pre_worker_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -605,7 +605,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(router_pre_worker_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (router_pre_worker_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -616,7 +616,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(router_pre_worker_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (router_pre_worker_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -665,7 +665,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(worker_generation_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (worker_generation_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -676,7 +676,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(worker_generation_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (worker_generation_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -687,7 +687,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(worker_generation_duration_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (worker_generation_duration_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -736,7 +736,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(worker_tpot_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (worker_tpot_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -747,7 +747,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(worker_tpot_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (worker_tpot_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -758,7 +758,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(worker_tpot_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (worker_tpot_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -807,7 +807,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(worker_ttft_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (worker_ttft_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -818,7 +818,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(worker_ttft_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (worker_ttft_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -829,7 +829,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(worker_ttft_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (worker_ttft_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -879,7 +879,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(router_inference_ttft_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (router_inference_ttft_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p50"
         },
         {
@@ -890,7 +890,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.90, sum by (le) (rate(router_inference_ttft_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (le) (router_inference_ttft_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p90"
         },
         {
@@ -901,7 +901,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(router_inference_ttft_seconds_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (router_inference_ttft_seconds_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "p99"
         }
       ]
@@ -963,7 +963,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "sum(rate(edge_inference_requests_total{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval]))",
+          "expr": "sum(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
           "legendFormat": "edge"
         },
         {
@@ -974,7 +974,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "sum(rate(router_inference_requests_total{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval]))",
+          "expr": "sum(router_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
           "legendFormat": "router"
         },
         {
@@ -1042,7 +1042,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "sum by (token_type) (rate(worker_token_total{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval]))",
+          "expr": "sum by (token_type) (worker_token_rate5m{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
           "legendFormat": "{{token_type}}"
         }
       ]
@@ -1091,7 +1091,7 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "histogram_quantile(0.95, sum by (le, token_type) (rate(worker_tokens_per_request_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le, token_type) (worker_tokens_per_request_rate5m_bucket{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"}))",
           "legendFormat": "{{token_type}} p95"
         }
       ]

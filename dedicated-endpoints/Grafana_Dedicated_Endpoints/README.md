@@ -10,6 +10,8 @@ The dashboard covers, per endpoint and deployment:
 - Throughput and tokens: request rate by layer, token throughput, and tokens per request.
 - Engine health: KV cache utilization and prefix cache hit rate.
 
+Request, token, and latency panels read the per-second rate metrics (`*_rate5m`, averaged over 5 minutes), so they chart them directly without `rate()`. If you imported an earlier version of this dashboard, re-import it: the earlier version reads counters that are being retired.
+
 ## Requirements
 
 - Grafana 10.2 or later.
