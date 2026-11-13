@@ -5,11 +5,11 @@
 #     "langchain-together",
 # ]
 # ///
-"""Content writer agent on Together AI's Nemotron 3 Ultra.
+"""Content writer agent on Together AI's NVIDIA Nemotron 3.5 Super.
 
 Ported from `deepagents/examples/deploy-content-writer` — the same brand-voice
 memory (AGENTS.md) and skills (blog-post, social-media), but running locally on
-`nvidia/nemotron-3-ultra-550b-a55b` via Together AI instead of a managed
+`nvidia/NVIDIA-Nemotron-3.5-Super-VL` via Together AI instead of a managed
 LangSmith deployment. The per-user memory / auth layer of the original is
 intentionally removed: every run is a fresh session and nothing persists
 except the content files the agent writes to `output/`.
@@ -26,7 +26,7 @@ from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 
 HERE = Path(__file__).parent
-MODEL = "together:nvidia/nemotron-3-ultra-550b-a55b"
+MODEL = "together:nvidia/NVIDIA-Nemotron-3.5-Super-VL"
 
 
 def build_agent():

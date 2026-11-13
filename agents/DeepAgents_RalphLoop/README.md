@@ -1,7 +1,7 @@
-# Ralph Loop with NVIDIA Nemotron 3 Ultra
+# Ralph Loop with NVIDIA Nemotron 3.5 Super
 
 An autonomous looping agent implementing the ["Ralph" pattern](https://ghuntley.com/ralph/) with
-[NVIDIA Nemotron 3 Ultra](https://api.together.ai/models/nvidia/nemotron-3-ultra-550b-a55b),
+[NVIDIA Nemotron 3.5 Super](https://api.together.ai/models/nvidia/NVIDIA-Nemotron-3.5-Super-VL),
 running on Together AI via [LangChain Deep Agents](https://github.com/langchain-ai/deepagents).
 
 This cookbook demonstrates how to build long-running agents that can make incremental
@@ -13,7 +13,7 @@ complex, multi-step workflows such as coding, research, and content generation.
 
 - How the Ralph pattern turns a single-shot agent into a long-running one: the same task,
   a fresh context window every iteration, and the filesystem as the only memory in between
-- How to run an open-weight model (Nemotron 3 Ultra on Together AI) inside the Deep Agents
+- How to run an open-weight model (Nemotron 3.5 Super on Together AI) inside the Deep Agents
   harness with `create_deep_agent`
 - How to persist and resume agent state through a workspace directory, using simple
   `PROGRESS.md` / `DONE.md` conventions
@@ -63,16 +63,16 @@ python ralph_loop.py "Build a beginner's Python course as markdown files" --iter
 Flags: `--iterations N` (default 3; `0` = loop until `DONE.md` or Ctrl+C),
 `--work-dir PATH` (default `./ralph_workspace`), `--model` (any
 `provider:model` LangChain string — swap in other Together models like
-`together:moonshotai/Kimi-K2-Instruct-0905`).
+`together:MiniMaxAI/MiniMax-M3.1-Flash`).
 
 Re-running with the same `--work-dir` resumes where the loop left off — the
 workspace, not the process, is the state.
 
 ## How it works
 
-`create_deep_agent` combines the Nemotron 3 Ultra model with the LangChain Deep Agents
+`create_deep_agent` combines the Nemotron 3.5 Super model with the LangChain Deep Agents
 harness: a planning tool (`write_todos`), filesystem tools (`ls`, `read_file`, `write_file`,
-`edit_file`, `glob`, `grep`), and subagent delegation (`task`). Nemotron 3 Ultra is
+`edit_file`, `glob`, `grep`), and subagent delegation (`task`). Nemotron 3.5 Super is
 particularly well suited for complex agentic workflows that require reasoning, planning,
 tool use, and multi-step execution. The agent is sandboxed to the workspace with
 `FilesystemBackend(root_dir=work_dir, virtual_mode=True)` — paths are virtualized under
