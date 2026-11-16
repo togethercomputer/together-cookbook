@@ -25,4 +25,6 @@ Follow the step-by-step guide in the Together AI docs: [Visualize endpoint metri
 2. In Grafana, go to **Dashboards** > **New** > **Import**.
 3. Upload [`together-dedicated-endpoints-dashboard.json`](./together-dedicated-endpoints-dashboard.json) and select your Prometheus datasource.
 
-Use the **Endpoint** and **Deployment** variables at the top of the dashboard to filter.
+Use the **Endpoint** and **Deployment** variables at the top of the dashboard to filter. They list endpoint and deployment names but filter by ID, so renaming a deployment keeps your selection.
+
+Router and worker metrics carry `endpoint_name` and `deployment_name` labels too, and the KV cache and cache hit rate panels show them. These names are Kubernetes label values: characters a label can't hold become `-`, and names are cut at 63 characters. To filter or join across metrics, use `endpoint_id` and `deployment_id`.
