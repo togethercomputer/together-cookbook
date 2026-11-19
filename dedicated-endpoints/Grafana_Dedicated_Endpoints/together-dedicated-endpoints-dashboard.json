@@ -63,30 +63,8 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(edge_inference_requests_rate5m, endpoint_id)",
-        "query": "label_values(edge_inference_requests_rate5m, endpoint_id)",
-        "refresh": 1,
-        "sort": 1,
-        "multi": true,
-        "includeAll": true,
-        "allValue": ".*",
-        "current": {
-          "text": "All",
-          "value": "$__all",
-          "selected": true
-        },
-        "options": []
-      },
-      {
-        "name": "deployment",
-        "label": "Deployment",
-        "type": "query",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "definition": "label_values(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\"}, deployment_id)",
-        "query": "label_values(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\"}, deployment_id)",
+        "definition": "query_result(count by (endpoint_id, endpoint_name) (count_over_time(edge_inference_requests_rate5m{endpoint_name!=\"\"}[$__range])) or label_replace(count by (endpoint_id) (count_over_time(edge_inference_requests_rate5m{endpoint_name=\"\"}[$__range])), \"endpoint_name\", \"$1\", \"endpoint_id\", \"(.*)\"))",
+        "query": "query_result(count by (endpoint_id, endpoint_name) (count_over_time(edge_inference_requests_rate5m{endpoint_name!=\"\"}[$__range])) or label_replace(count by (endpoint_id) (count_over_time(edge_inference_requests_rate5m{endpoint_name=\"\"}[$__range])), \"endpoint_name\", \"$1\", \"endpoint_id\", \"(.*)\"))",
         "refresh": 2,
         "sort": 1,
         "multi": true,
@@ -97,7 +75,31 @@
           "value": "$__all",
           "selected": true
         },
-        "options": []
+        "options": [],
+        "regex": "/endpoint_id=\"(?<value>[^\"]+)\".*endpoint_name=\"(?<text>[^\"]+)\"/"
+      },
+      {
+        "name": "deployment",
+        "label": "Deployment",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "query_result(count by (deployment_id, deployment_name) (count_over_time(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_name!=\"\"}[$__range])) or label_replace(count by (deployment_id) (count_over_time(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_name=\"\"}[$__range])), \"deployment_name\", \"$1\", \"deployment_id\", \"(.*)\"))",
+        "query": "query_result(count by (deployment_id, deployment_name) (count_over_time(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_name!=\"\"}[$__range])) or label_replace(count by (deployment_id) (count_over_time(edge_inference_requests_rate5m{endpoint_id=~\"$endpoint\",deployment_name=\"\"}[$__range])), \"deployment_name\", \"$1\", \"deployment_id\", \"(.*)\"))",
+        "refresh": 2,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
+        "options": [],
+        "regex": "/deployment_id=\"(?<value>[^\"]+)\".*deployment_name=\"(?<text>[^\"]+)\"/"
       }
     ]
   },
@@ -116,14 +118,14 @@
       "id": 1,
       "type": "text",
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 0
       },
       "options": {
         "mode": "markdown",
-        "content": "**Together Dedicated Endpoint Metrics \u2014 example dashboard.** Requires a Prometheus/Alloy that scrapes `https://o11y-de2-metrics.cloud.together.ai/organizations/{org_id}/metrics` (Bearer = your Together API key). Use the **Endpoint** / **Deployment** variables to filter. Request, token and latency metrics are per-second rates over the last 5 minutes (`*_rate5m`), so panels use them directly, without `rate()`; latency percentiles come from their `_rate5m_bucket` series. `worker_inference_request_total` is still a counter. Note: `edge_*` latencies are in **milliseconds**; `router_*` / `worker_*` latencies are in **seconds**."
+        "content": "**Together Dedicated Endpoint Metrics \u2014 example dashboard.** Requires a Prometheus/Alloy that scrapes `https://o11y-de2-metrics.cloud.together.ai/organizations/{org_id}/metrics` (Bearer = your Together API key). Use the **Endpoint** / **Deployment** variables to filter. Request, token and latency metrics are per-second rates over the last 5 minutes (`*_rate5m`), so panels use them directly, without `rate()`; latency percentiles come from their `_rate5m_bucket` series. `worker_inference_request_total` is still a counter. Note: `edge_*` latencies are in **milliseconds**; `router_*` / `worker_*` latencies are in **seconds**. The **Endpoint** / **Deployment** dropdowns list names but filter by ID, so a rename keeps the selection. `router_*` / `worker_*` series also carry `endpoint_name` / `deployment_name` (the per-deployment panels show them, or the ID for a series that has no name yet). Those names are Kubernetes label values: characters a label can't hold become `-` and they are cut at 63 characters, so filter and join on the IDs."
       }
     },
     {
@@ -135,7 +137,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 4
       },
       "panels": []
     },
@@ -151,7 +153,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 4
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
@@ -208,7 +210,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 4
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
@@ -270,7 +272,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 4
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
@@ -320,7 +322,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 12
+        "y": 13
       },
       "panels": []
     },
@@ -336,7 +338,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 13
+        "y": 14
       },
       "fieldConfig": {
         "defaults": {
@@ -407,7 +409,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 14
       },
       "fieldConfig": {
         "defaults": {
@@ -475,7 +477,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 22
       },
       "panels": []
     },
@@ -491,7 +493,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 22
+        "y": 23
       },
       "fieldConfig": {
         "defaults": {
@@ -562,7 +564,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 22
+        "y": 23
       },
       "fieldConfig": {
         "defaults": {
@@ -633,7 +635,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 22
+        "y": 23
       },
       "fieldConfig": {
         "defaults": {
@@ -704,7 +706,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 30
+        "y": 31
       },
       "fieldConfig": {
         "defaults": {
@@ -775,7 +777,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 30
+        "y": 31
       },
       "fieldConfig": {
         "defaults": {
@@ -847,7 +849,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 30
+        "y": 31
       },
       "fieldConfig": {
         "defaults": {
@@ -915,7 +917,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 39
       },
       "panels": []
     },
@@ -931,7 +933,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 39
+        "y": 40
       },
       "fieldConfig": {
         "defaults": {
@@ -1002,7 +1004,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 39
+        "y": 40
       },
       "fieldConfig": {
         "defaults": {
@@ -1059,7 +1061,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 47
+        "y": 48
       },
       "fieldConfig": {
         "defaults": {
@@ -1108,7 +1110,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 47
+        "y": 48
       },
       "fieldConfig": {
         "defaults": {
@@ -1165,7 +1167,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 55
+        "y": 56
       },
       "panels": []
     },
@@ -1181,7 +1183,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 56
+        "y": 57
       },
       "fieldConfig": {
         "defaults": {
@@ -1215,8 +1217,8 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "avg by (deployment_id) (worker_engine_kv_cache_utilization{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
-          "legendFormat": "{{deployment_id}} avg"
+          "expr": "avg by (deployment_id, deployment_name) (worker_engine_kv_cache_utilization{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\",deployment_name!=\"\"} or label_replace(worker_engine_kv_cache_utilization{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\",deployment_name=\"\"}, \"deployment_name\", \"$1\", \"deployment_id\", \"(.*)\"))",
+          "legendFormat": "{{deployment_name}} avg"
         },
         {
           "refId": "B",
@@ -1226,8 +1228,8 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "max by (deployment_id) (worker_engine_kv_cache_utilization{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
-          "legendFormat": "{{deployment_id}} max"
+          "expr": "max by (deployment_id, deployment_name) (worker_engine_kv_cache_utilization{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\",deployment_name!=\"\"} or label_replace(worker_engine_kv_cache_utilization{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\",deployment_name=\"\"}, \"deployment_name\", \"$1\", \"deployment_id\", \"(.*)\"))",
+          "legendFormat": "{{deployment_name}} max"
         }
       ],
       "description": "KV-cache occupancy per deployment (avg and hottest replica), unified across inference engines. Gauge 0-1."
@@ -1244,7 +1246,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 56
+        "y": 57
       },
       "fieldConfig": {
         "defaults": {
@@ -1278,8 +1280,8 @@
           },
           "editorMode": "code",
           "range": true,
-          "expr": "avg by (deployment_id) (worker_engine_cache_hit_rate{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\"})",
-          "legendFormat": "{{deployment_id}}"
+          "expr": "avg by (deployment_id, deployment_name) (worker_engine_cache_hit_rate{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\",deployment_name!=\"\"} or label_replace(worker_engine_cache_hit_rate{endpoint_id=~\"$endpoint\",deployment_id=~\"$deployment\",deployment_name=\"\"}, \"deployment_name\", \"$1\", \"deployment_id\", \"(.*)\"))",
+          "legendFormat": "{{deployment_name}}"
         }
       ],
       "description": "Prefix-cache hit rate per deployment, unified across inference engines: cached input tokens as a fraction of all input tokens, token-weighted over 5m. Gauge 0-1. A replica serving no traffic in the window reports no sample, so an idle deployment leaves a gap rather than a zero line."
